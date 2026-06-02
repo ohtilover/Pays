@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El hada de los pays | Repostería Artesanal</title>
+    <title>El hada de los pays | Menú Digital</title>
     <!-- Tailwind CSS Engine -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -25,9 +25,12 @@
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;600;800&display=swap');
         .font-serif { font-family: 'Cormorant Garamond', serif; }
         .font-sans { font-family: 'Inter', sans-serif; }
+        /* Smooth fallback if images aren't uploaded yet */
+        img:not([src]) { display: none; }
+        img[src=""] { display: none; }
     </style>
 </head>
-<body class="bg-bakeryCream text-bakeryChoco font-sans min-h-screen pb-24 antialiased">
+<body class="bg-bakeryCream text-bakeryChoco font-sans min-h-screen pb-28 antialiased">
 
     <!-- 1. HEADER EXCLUSIVO -->
     <header class="sticky top-0 z-50 bg-[#FAF6F0]/90 backdrop-blur-md border-b border-bakeryChoco/10 px-4 py-3 flex items-center justify-between shadow-sm">
@@ -38,108 +41,219 @@
                 <span class="text-[10px] font-bold uppercase tracking-wider text-bakeryChoco/60">5.0 de Calificación</span>
             </div>
         </div>
-        <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20conocer%20la%20variedad%20del%20día%20y%20hacer%20un%20pedido." 
+        <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20hacer%20un%20pedido%20del%20menú%20digital." 
            class="flex items-center gap-1.5 bg-whatsappGreen text-white font-bold py-2 px-3.5 rounded-full text-xs transition-all shadow-sm active:scale-95">
-            <span>Pedir Hoy</span>
+            <span>Pedir por WhatsApp</span>
         </a>
     </header>
 
-    <!-- 2. SECTION HERO (IMAGEN Y FRASE) -->
+    <!-- 2. SECTION HERO -->
     <section class="relative bg-bakeryChoco text-white overflow-hidden">
-        <!-- Imagen de Pastelería Fina Recién Horneada -->
         <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80" 
              alt="Panadería Artesanal" 
-             class="w-full h-64 object-cover opacity-50" />
-        <div class="absolute inset-0 bg-gradient-to-t from-bakeryChoco via-bakeryChoco/30 to-transparent"></div>
+             class="w-full h-48 object-cover opacity-40" />
+        <div class="absolute inset-0 bg-gradient-to-t from-bakeryChoco via-bakeryChoco/20 to-transparent"></div>
         
-        <div class="absolute bottom-0 inset-x-0 p-6 text-center">
-            <h2 class="text-3xl font-bold font-serif mb-2 text-bakeryCream">Repostería Artesanal Hecha con Amor</h2>
-            <p class="text-sm text-bakeryCream/80 font-light max-w-sm mx-auto mb-4">Cada uno de nuestros pays, muffins y panqués se hornea diariamente con ingredientes selectos en Celaya.</p>
-            
-            <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20conocer%20la%20variedad%20del%20día%20y%20hacer%20un%20pedido." 
-               class="inline-block w-full max-w-xs bg-bakeryOrange hover:bg-bakeryGold text-bakeryChoco font-extrabold py-3.5 rounded-xl text-md shadow-lg transition-all active:scale-[0.98]">
-                Ordenar por WhatsApp
-            </a>
+        <div class="absolute bottom-0 inset-x-0 p-5 text-center">
+            <h2 class="text-2xl font-bold font-serif mb-1 text-bakeryCream">Nuestro Catálogo Exclusivo</h2>
+            <p class="text-xs text-bakeryCream/80 font-light max-w-sm mx-auto">Elige tus favoritos y ordénalos fácilmente dando clic al botón verde de cada producto.</p>
         </div>
     </section>
 
-    <!-- 3. MENÚ DIGITAL -->
-    <main class="p-4 max-w-md mx-auto space-y-6">
+    <!-- 3. CONTENEDOR PRINCIPAL DEL MENÚ -->
+    <main class="p-4 max-w-md mx-auto space-y-8">
         
-        <div class="text-center my-4">
-            <span class="text-xs font-bold uppercase tracking-widest text-bakeryGold bg-bakeryChoco/5 px-3 py-1 rounded-full">Nuestro Menú Casero</span>
-        </div>
+        <!-- SECCIÓN 1: PAYS -->
+        <div class="space-y-3">
+            <h3 class="text-lg font-bold font-serif text-bakeryChoco border-b-2 border-bakeryGold pb-1 mb-2 flex justify-between items-center">
+                <span>Nuestros Pays Artesanales</span>
+                <span class="text-xs font-sans text-bakeryGold font-bold uppercase">Pieza Entera</span>
+            </h3>
 
-        <!-- Categoría 1: Pays -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-bakeryChoco/5">
-            <h3 class="text-lg font-bold font-serif text-bakeryGold border-b border-bakeryCream pb-2 mb-3">Nuestros Pays</h3>
-            <div class="space-y-3.5">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="font-semibold text-sm">Pay de Queso Tradicional</p>
-                        <p class="text-xs text-bakeryChoco/60">Receta cremosa casera con costra crujiente</p>
+            <!-- Item 1: Pay de Manzana -->
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3">
+                <img src="pay-manzana.jpg" alt="Pay de Manzana" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-baseline">
+                        <h4 class="font-bold text-sm truncate">Pay de Manzana</h4>
+                        <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$100</span>
                     </div>
+                    <p class="text-xs text-bakeryChoco/60 line-clamp-1 mt-0.5">Pasta de hojaldre tradicional y manzana selecta.</p>
+                    <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20ordenar%20un%20Pay%20de%20Manzana%20(MX$100)." class="inline-flex items-center text-[10px] bg-whatsappGreen/10 text-whatsappGreen font-bold px-2 py-0.5 rounded mt-1.5">💬 Pedir este</a>
                 </div>
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="font-semibold text-sm">Pay de Limón Helado</p>
-                        <p class="text-xs text-bakeryChoco/60">Fresco, cítrico y perfecto para compartir</p>
+            </div>
+
+            <!-- Item 2: Pay de Atún -->
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3">
+                <img src="pay-atun.jpg" alt="Pay de Atún" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-baseline">
+                        <h4 class="font-bold text-sm truncate">Pay de Atún</h4>
+                        <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$100</span>
                     </div>
+                    <p class="text-xs text-bakeryChoco/60 line-clamp-1 mt-0.5">Pasta de hojaldre y atún guisado a la mexicana.</p>
+                    <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20ordenar%20un%20Pay%20de%20Atún%20(MX$100)." class="inline-flex items-center text-[10px] bg-whatsappGreen/10 text-whatsappGreen font-bold px-2 py-0.5 rounded mt-1.5">💬 Pedir este</a>
                 </div>
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="font-semibold text-sm">Pays Especiales de Temporada</p>
-                        <p class="text-xs text-bakeryChoco/60">Pregunta por nuestras frutas e ingredientes del mes</p>
+            </div>
+
+            <!-- Item 3: Pay de Fresa -->
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3">
+                <img src="pay-fresa.jpg" alt="Pay de Fresa" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-baseline">
+                        <h4 class="font-bold text-sm truncate">Pay de Fresa</h4>
+                        <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$100</span>
                     </div>
+                    <p class="text-xs text-bakeryChoco/60 line-clamp-1 mt-0.5">Pay de queso cremoso con fresas frescas.</p>
+                    <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20ordenar%20un%20Pay%20de%20Fresa%20(MX$100)." class="inline-flex items-center text-[10px] bg-whatsappGreen/10 text-whatsappGreen font-bold px-2 py-0.5 rounded mt-1.5">💬 Pedir este</a>
+                </div>
+            </div>
+
+            <!-- Item 4: Pay de Chocolate -->
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3">
+                <img src="pay-chocolate.jpg" alt="Pay de Chocolate" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-baseline">
+                        <h4 class="font-bold text-sm truncate">Pay de Chocolate</h4>
+                        <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$100</span>
+                    </div>
+                    <p class="text-xs text-bakeryChoco/60 line-clamp-1 mt-0.5">Pay de queso suave con una rica cubierta de chocolate.</p>
+                    <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20ordenar%20un%20Pay%20de%20Chocolate%20(MX$100)." class="inline-flex items-center text-[10px] bg-whatsappGreen/10 text-whatsappGreen font-bold px-2 py-0.5 rounded mt-1.5">💬 Pedir este</a>
+                </div>
+            </div>
+
+            <!-- Item 5: Pay de Chocolate con Fresas -->
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3">
+                <img src="pay-chocolate-fresas.jpg" alt="Pay de Chocolate con Fresas" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-baseline">
+                        <h4 class="font-bold text-sm truncate">Pay de Chocolate con Fresas</h4>
+                        <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$100</span>
+                    </div>
+                    <p class="text-xs text-bakeryChoco/60 line-clamp-1 mt-0.5">Pay de queso premium con cubierta de chocolate y fresas frescas.</p>
+                    <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20ordenar%20un%20Pay%20de%20Chocolate%20con%20Fresas%20(MX$100)." class="inline-flex items-center text-[10px] bg-whatsappGreen/10 text-whatsappGreen font-bold px-2 py-0.5 rounded mt-1.5">💬 Pedir este</a>
                 </div>
             </div>
         </div>
 
-        <!-- Categoría 2: Panqués -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-bakeryChoco/5">
-            <h3 class="text-lg font-bold font-serif text-bakeryGold border-b border-bakeryCream pb-2 mb-3">Panqués y Muffins</h3>
-            <div class="space-y-3.5">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="font-semibold text-sm">Muffins de Chocolate Irresistibles</p>
-                        <p class="text-xs text-bakeryChoco/60">Esponjosos y cargados de trozos de chocolate real</p>
+        <!-- SECCIÓN 2: MUFFINS CASEROS -->
+        <div class="space-y-3">
+            <h3 class="text-lg font-bold font-serif text-bakeryChoco border-b-2 border-bakeryGold pb-1 mb-2">
+                Muffins Esponjosos (Por Caja)
+            </h3>
+
+            <!-- Item 6: Muffin de plátano con arándanos -->
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3">
+                <img src="muffin-platano.jpg" alt="Muffin de Plátano con Arándanos" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-baseline">
+                        <h4 class="font-bold text-sm truncate">Muffin Plátano con Arándanos</h4>
+                        <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$50</span>
                     </div>
+                    <p class="text-xs text-bakeryOrange font-bold mt-0.5">Caja con 4 piezas</p>
+                    <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20ordenar%20la%20Caja%20con%204%20Muffins%20de%20Plátano%20con%20Arándanos%20(MX$50)." class="inline-flex items-center text-[10px] bg-whatsappGreen/10 text-whatsappGreen font-bold px-2 py-0.5 rounded mt-1.5">💬 Pedir Caja</a>
                 </div>
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="font-semibold text-sm">Panqué de Nuez Tradicional</p>
-                        <p class="text-xs text-bakeryChoco/60">El compañero ideal para tu café de la tarde</p>
+            </div>
+
+            <!-- Item 7: Muffin de zanahoria (4 piezas) -->
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3">
+                <img src="muffin-zanahoria-4.jpg" alt="Muffin de Zanahoria 4 pzas" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-baseline">
+                        <h4 class="font-bold text-sm truncate">Muffin de Zanahoria</h4>
+                        <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$40</span>
                     </div>
+                    <p class="text-xs text-bakeryOrange font-bold mt-0.5">Caja con 4 piezas</p>
+                    <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20ordenar%20la%20Caja%20con%204%20Muffins%20de%20Zanahoria%20(MX$40)." class="inline-flex items-center text-[10px] bg-whatsappGreen/10 text-whatsappGreen font-bold px-2 py-0.5 rounded mt-1.5">💬 Pedir Caja</a>
+                </div>
+            </div>
+
+            <!-- Item 8: Muffin de zanahoria con nuez (4 piezas) -->
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3">
+                <img src="muffin-zanahoria-nuez.jpg" alt="Muffin de Zanahoria con Nuez" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-baseline">
+                        <h4 class="font-bold text-sm truncate">Muffin de Zanahoria con Nuez</h4>
+                        <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$50</span>
+                    </div>
+                    <p class="text-xs text-bakeryOrange font-bold mt-0.5">Caja con 4 piezas</p>
+                    <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20ordenar%20la%20Caja%20con%204%20Muffins%20de%20Zanahoria%20con%20Nuez%20(MX$50)." class="inline-flex items-center text-[10px] bg-whatsappGreen/10 text-whatsappGreen font-bold px-2 py-0.5 rounded mt-1.5">💬 Pedir Caja</a>
+                </div>
+            </div>
+
+            <!-- Item 9: Muffin de zanahoria (8 piezas) -->
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3">
+                <img src="muffin-zanahoria-8.jpg" alt="Muffin de Zanahoria 8 pzas" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-baseline">
+                        <h4 class="font-bold text-sm truncate">Muffin de Zanahoria Grandes</h4>
+                        <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$75</span>
+                    </div>
+                    <p class="text-xs text-bakeryOrange font-bold mt-0.5">Caja Familiar con 8 piezas</p>
+                    <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20ordenar%20la%20Caja%20con%208%20Muffins%20de%20Zanahoria%20(MX$75)." class="inline-flex items-center text-[10px] bg-whatsappGreen/10 text-whatsappGreen font-bold px-2 py-0.5 rounded mt-1.5">💬 Pedir Caja</a>
+                </div>
+            </div>
+
+            <!-- Item 10: Muffin de zanahoria con arándano (12 piezas) -->
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3">
+                <img src="muffin-zanahoria-arandano.jpg" alt="Muffin de Zanahoria con Arándano" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-baseline">
+                        <h4 class="font-bold text-sm truncate">Muffin Zanahoria con Arándano</h4>
+                        <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$120</span>
+                    </div>
+                    <p class="text-xs text-bakeryOrange font-bold mt-0.5">Caja Grande con 12 piezas</p>
+                    <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20ordenar%20la%20Caja%20con%2012%20Muffins%20de%20Zanahoria%20con%20Arándano%20(MX$120)." class="inline-flex items-center text-[10px] bg-whatsappGreen/10 text-whatsappGreen font-bold px-2 py-0.5 rounded mt-1.5">💬 Pedir Caja</a>
                 </div>
             </div>
         </div>
 
-        <!-- Categoría 3: Especialidades -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-bakeryChoco/5">
-            <h3 class="text-lg font-bold font-serif text-bakeryGold border-b border-bakeryCream pb-2 mb-3">Especialidades</h3>
-            <div class="space-y-3.5">
-                <div class="flex justify-between items-start">
-                    <div>
-                        <p class="font-semibold text-sm">Galletería Fina Casera</p>
-                        <p class="text-xs text-bakeryChoco/60">Horneadas en lotes pequeños con mantequilla pura</p>
+        <!-- SECCIÓN 3: ESPECIALIDADES Y COMPLEMENTOS -->
+        <div class="space-y-3">
+            <h3 class="text-lg font-bold font-serif text-bakeryChoco border-b-2 border-bakeryGold pb-1 mb-2">
+                Especialidades de la Casa
+            </h3>
+
+            <!-- Item 11: Besos de Nuez -->
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3">
+                <img src="besos-nuez.jpg" alt="Besos de Nuez" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-baseline">
+                        <h4 class="font-bold text-sm truncate">Besos de Nuez</h4>
+                        <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$45</span>
                     </div>
+                    <p class="text-xs text-bakeryChoco/60 line-clamp-1 mt-0.5">Galletas finas de nuez espolvoreadas con azúcar glass.</p>
+                    <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20ordenar%20unos%20Besos%20de%20Nuez%20(MX$45)." class="inline-flex items-center text-[10px] bg-whatsappGreen/10 text-whatsappGreen font-bold px-2 py-0.5 rounded mt-1.5">💬 Pedir Paquete</a>
+                </div>
+            </div>
+
+            <!-- Item 12: Salsa Artesanal -->
+            <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3">
+                <img src="salsa-artesanal.jpg" alt="Salsa Artesanal" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
+                <div class="flex-1 min-w-0">
+                    <div class="flex justify-between items-baseline">
+                        <h4 class="font-bold text-sm truncate">Salsa Artesanal de la Casa</h4>
+                        <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$100</span>
+                    </div>
+                    <p class="text-xs text-bakeryChoco/60 line-clamp-1 mt-0.5">Deliciosa salsa de chiltepín o chile de árbol elaborado en casa.</p>
+                    <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20ordenar%20una%20Salsa%20Artesanal%20(MX$100)." class="inline-flex items-center text-[10px] bg-whatsappGreen/10 text-whatsappGreen font-bold px-2 py-0.5 rounded mt-1.5">💬 Pedir Frasco</a>
                 </div>
             </div>
         </div>
 
-        <!-- 4. DIRECCIÓN Y HORARIOS (PULL DE IMAGE_2.PNG) -->
+        <!-- 4. DIRECCIÓN Y HORARIOS (UBICACIÓN DESDE MAPS) -->
         <section class="bg-bakeryChoco text-bakeryCream p-5 rounded-2xl space-y-4 shadow-md">
             <div class="space-y-1">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-bakeryGold">Visítanos o Solicita Entrega</h4>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-bakeryGold">Visítanos en Celaya</h4>
                 <p class="text-sm font-semibold">Lic Andrés Quintana Roo 721-2</p>
-                <p class="text-xs text-bakeryCream/70">Las Fuentes, Celaya, Gto.</p>
+                <p class="text-xs text-bakeryCream/70">Las Fuentes, Celaya, Guanajuato.</p>
             </div>
             
             <div class="border-t border-bakeryCream/10 pt-3 space-y-1">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-bakeryGold">Horario de Atención</h4>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-bakeryGold">Horario del Horno</h4>
                 <p class="text-xs">Lunes a Sábado: <span class="font-semibold text-bakeryOrange">10:00 AM - 5:00 PM</span></p>
-                <p class="text-xs text-bakeryCream/60">(Miércoles cerramos a las 3:00 PM)</p>
-                <p class="text-xs text-bakeryCream/40 italic mt-1">Jueves y Domingo: Cerrado</p>
+                <p class="text-xs text-bakeryCream/60">(Los Miércoles cerramos temprano a las 3:00 PM)</p>
+                <p class="text-xs text-bakeryCream/40 italic mt-1">Jueves y Domingo: Cerrado por descanso</p>
             </div>
         </section>
 
