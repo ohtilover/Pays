@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>El hada de los pays | Repostería Artesanal</title>
+    <!-- Tailwind CSS Engine -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        bakeryCream: '#FAF6F0',
+                        bakeryChoco: '#2C1A11',
+                        bakeryGold: '#D4A373',
+                        bakeryOrange: '#E6A15C',
+                        whatsappGreen: '#25D366'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;600;800&display=swap');
+        .font-serif { font-family: 'Cormorant Garamond', serif; }
+        .font-sans { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-bakeryCream text-bakeryChoco font-sans min-h-screen pb-24 antialiased">
+
+    <!-- 1. HEADER EXCLUSIVO -->
+    <header class="sticky top-0 z-50 bg-[#FAF6F0]/90 backdrop-blur-md border-b border-bakeryChoco/10 px-4 py-3 flex items-center justify-between shadow-sm">
+        <div>
+            <h1 class="text-xl font-extrabold tracking-tight font-serif text-bakeryChoco">El hada de los pays</h1>
+            <div class="flex items-center gap-1 mt-0.5">
+                <span class="text-amber-500 text-xs">★★★★★</span>
+                <span class="text-[10px] font-bold uppercase tracking-wider text-bakeryChoco/60">5.0 de Calificación</span>
+            </div>
+        </div>
+        <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20conocer%20la%20variedad%20del%20día%20y%20hacer%20un%20pedido." 
+           class="flex items-center gap-1.5 bg-whatsappGreen text-white font-bold py-2 px-3.5 rounded-full text-xs transition-all shadow-sm active:scale-95">
+            <span>Pedir Hoy</span>
+        </a>
+    </header>
+
+    <!-- 2. SECTION HERO (IMAGEN Y FRASE) -->
+    <section class="relative bg-bakeryChoco text-white overflow-hidden">
+        <!-- Imagen de Pastelería Fina Recién Horneada -->
+        <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80" 
+             alt="Panadería Artesanal" 
+             class="w-full h-64 object-cover opacity-50" />
+        <div class="absolute inset-0 bg-gradient-to-t from-bakeryChoco via-bakeryChoco/30 to-transparent"></div>
+        
+        <div class="absolute bottom-0 inset-x-0 p-6 text-center">
+            <h2 class="text-3xl font-bold font-serif mb-2 text-bakeryCream">Repostería Artesanal Hecha con Amor</h2>
+            <p class="text-sm text-bakeryCream/80 font-light max-w-sm mx-auto mb-4">Cada uno de nuestros pays, muffins y panqués se hornea diariamente con ingredientes selectos en Celaya.</p>
+            
+            <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20conocer%20la%20variedad%20del%20día%20y%20hacer%20un%20pedido." 
+               class="inline-block w-full max-w-xs bg-bakeryOrange hover:bg-bakeryGold text-bakeryChoco font-extrabold py-3.5 rounded-xl text-md shadow-lg transition-all active:scale-[0.98]">
+                Ordenar por WhatsApp
+            </a>
+        </div>
+    </section>
+
+    <!-- 3. MENÚ DIGITAL -->
+    <main class="p-4 max-w-md mx-auto space-y-6">
+        
+        <div class="text-center my-4">
+            <span class="text-xs font-bold uppercase tracking-widest text-bakeryGold bg-bakeryChoco/5 px-3 py-1 rounded-full">Nuestro Menú Casero</span>
+        </div>
+
+        <!-- Categoría 1: Pays -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-bakeryChoco/5">
+            <h3 class="text-lg font-bold font-serif text-bakeryGold border-b border-bakeryCream pb-2 mb-3">Nuestros Pays</h3>
+            <div class="space-y-3.5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-semibold text-sm">Pay de Queso Tradicional</p>
+                        <p class="text-xs text-bakeryChoco/60">Receta cremosa casera con costra crujiente</p>
+                    </div>
+                </div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-semibold text-sm">Pay de Limón Helado</p>
+                        <p class="text-xs text-bakeryChoco/60">Fresco, cítrico y perfecto para compartir</p>
+                    </div>
+                </div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-semibold text-sm">Pays Especiales de Temporada</p>
+                        <p class="text-xs text-bakeryChoco/60">Pregunta por nuestras frutas e ingredientes del mes</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categoría 2: Panqués -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-bakeryChoco/5">
+            <h3 class="text-lg font-bold font-serif text-bakeryGold border-b border-bakeryCream pb-2 mb-3">Panqués y Muffins</h3>
+            <div class="space-y-3.5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-semibold text-sm">Muffins de Chocolate Irresistibles</p>
+                        <p class="text-xs text-bakeryChoco/60">Esponjosos y cargados de trozos de chocolate real</p>
+                    </div>
+                </div>
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-semibold text-sm">Panqué de Nuez Tradicional</p>
+                        <p class="text-xs text-bakeryChoco/60">El compañero ideal para tu café de la tarde</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Categoría 3: Especialidades -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-bakeryChoco/5">
+            <h3 class="text-lg font-bold font-serif text-bakeryGold border-b border-bakeryCream pb-2 mb-3">Especialidades</h3>
+            <div class="space-y-3.5">
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-semibold text-sm">Galletería Fina Casera</p>
+                        <p class="text-xs text-bakeryChoco/60">Horneadas en lotes pequeños con mantequilla pura</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. DIRECCIÓN Y HORARIOS (PULL DE IMAGE_2.PNG) -->
+        <section class="bg-bakeryChoco text-bakeryCream p-5 rounded-2xl space-y-4 shadow-md">
+            <div class="space-y-1">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-bakeryGold">Visítanos o Solicita Entrega</h4>
+                <p class="text-sm font-semibold">Lic Andrés Quintana Roo 721-2</p>
+                <p class="text-xs text-bakeryCream/70">Las Fuentes, Celaya, Gto.</p>
+            </div>
+            
+            <div class="border-t border-bakeryCream/10 pt-3 space-y-1">
+                <h4 class="text-xs font-bold uppercase tracking-wider text-bakeryGold">Horario de Atención</h4>
+                <p class="text-xs">Lunes a Sábado: <span class="font-semibold text-bakeryOrange">10:00 AM - 5:00 PM</span></p>
+                <p class="text-xs text-bakeryCream/60">(Miércoles cerramos a las 3:00 PM)</p>
+                <p class="text-xs text-bakeryCream/40 italic mt-1">Jueves y Domingo: Cerrado</p>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 5. FOOTER FIJO DE WHATSAPP PARA MÓVILES -->
+    <footer class="fixed bottom-0 inset-x-0 bg-white border-t border-bakeryChoco/10 p-3 z-50 shadow-[0_-4px_12px_rgba(0,0,0,0.05)]">
+        <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20conocer%20la%20variedad%20del%20día%20y%20hacer%20un%20pedido." 
+           class="flex items-center justify-center gap-2 bg-whatsappGreen text-white font-extrabold py-3.5 rounded-xl w-full transition-all text-base shadow-md active:scale-95">
+            <span>💬 ¿Antojo de algo dulce? Pide por WhatsApp</span>
+        </a>
+    </footer>
+
+</body>
+</html>
