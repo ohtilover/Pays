@@ -10,10 +10,14 @@
             theme: {
                 extend: {
                     colors: {
-                        bakeryCream: '#FAF6F0',
-                        bakeryChoco: '#2C1A11',
-                        bakeryGold: '#D4A373',
-                        bakeryOrange: '#E6A15C',
+                        cream:     '#FAF7FB',
+                        inkDark:   '#2A1A35',
+                        inkMid:    '#5C4470',
+                        lavender:  '#B48FD4',
+                        lavLight:  '#E8D9F5',
+                        blush:     '#E9A0B8',
+                        blushLight:'#FAE8F0',
+                        cardBg:    '#FFFFFF',
                         whatsappGreen: '#25D366'
                     }
                 }
@@ -21,459 +25,904 @@
         }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
-        * { box-sizing: border-box; }
-        .font-serif  { font-family: 'Cormorant Garamond', serif; }
-        .font-sans   { font-family: 'DM Sans', sans-serif; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-        /* ── Cart badge pulse ── */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FAF7FB;
+            color: #2A1A35;
+            min-height: 100vh;
+            padding-bottom: 6rem;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .font-serif { font-family: 'Cormorant Garamond', serif; }
+
+        /* ── Subtle background texture ── */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(ellipse 60% 40% at 10% 0%, rgba(180,143,212,0.08) 0%, transparent 60%),
+                radial-gradient(ellipse 50% 30% at 90% 15%, rgba(233,160,184,0.07) 0%, transparent 55%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ── Badge animation ── */
         @keyframes badge-pop {
             0%   { transform: scale(1); }
-            40%  { transform: scale(1.45); }
-            70%  { transform: scale(0.9); }
+            35%  { transform: scale(1.4); }
+            65%  { transform: scale(0.92); }
             100% { transform: scale(1); }
         }
-        .badge-pop { animation: badge-pop 0.35s ease; }
+        .badge-pop { animation: badge-pop 0.3s ease; }
 
-        /* ── Add-to-cart button ripple ── */
-        @keyframes btn-added {
-            0%   { background-color: #25D366; color: #fff; transform: scale(1); }
-            30%  { transform: scale(0.93); }
-            60%  { background-color: #1da851; transform: scale(1.04); }
-            100% { background-color: #25D366; color: #fff; transform: scale(1); }
+        /* ── Button confirmed state ── */
+        @keyframes btn-confirmed {
+            0%   { background: #5fa852; }
+            100% { background: #5fa852; }
         }
-        .btn-added { animation: btn-added 0.4s ease forwards; }
+        .btn-confirmed {
+            background: #5C9E52 !important;
+            pointer-events: none;
+        }
 
-        /* ── Drawer slide-up ── */
+        /* ── Cart drawer ── */
         #cart-drawer {
-            transition: transform 0.38s cubic-bezier(0.4, 0, 0.2, 1),
-                        opacity  0.38s ease;
+            transition: transform 0.34s cubic-bezier(0.32, 0, 0.15, 1), opacity 0.3s ease;
         }
         #cart-drawer.hidden-drawer {
             transform: translateY(100%);
             opacity: 0;
             pointer-events: none;
         }
-        #cart-overlay {
-            transition: opacity 0.3s ease;
-        }
-        #cart-overlay.hidden-overlay {
-            opacity: 0;
-            pointer-events: none;
-        }
+        #cart-overlay { transition: opacity 0.28s ease; }
+        #cart-overlay.hidden-overlay { opacity: 0; pointer-events: none; }
 
-        /* ── Qty stepper ── */
+        /* ── Qty buttons ── */
         .qty-btn {
-            width: 28px; height: 28px;
+            width: 26px; height: 26px;
             display: flex; align-items: center; justify-content: center;
             border-radius: 50%;
-            font-weight: 700; font-size: 16px;
-            transition: background 0.15s, transform 0.1s;
-            flex-shrink: 0;
+            font-size: 14px; font-weight: 600;
+            transition: opacity 0.15s, transform 0.1s;
+            flex-shrink: 0; cursor: pointer; border: none;
         }
         .qty-btn:active { transform: scale(0.88); }
 
-        /* ── Cart item row entrance ── */
+        /* ── Cart row ── */
         @keyframes row-in {
-            from { opacity: 0; transform: translateX(18px); }
-            to   { opacity: 1; transform: translateX(0); }
+            from { opacity: 0; transform: translateY(8px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
-        .cart-row { animation: row-in 0.25s ease; }
+        .cart-row { animation: row-in 0.2s ease; }
 
-        /* Scrollbar styling for cart list */
-        #cart-items-list::-webkit-scrollbar { width: 4px; }
-        #cart-items-list::-webkit-scrollbar-track { background: transparent; }
-        #cart-items-list::-webkit-scrollbar-thumb { background: #D4A373; border-radius: 4px; }
+        /* ── Product card ── */
+        .product-card {
+            transition: box-shadow 0.2s;
+            position: relative;
+            z-index: 1;
+        }
 
-        img:not([src]), img[src=""] { display:none; }
+        /* ── Section heading ── */
+        .section-heading {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+        .section-heading::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, rgba(180,143,212,0.35), transparent);
+        }
+
+        /* ── Add to cart button ── */
+        .add-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.02em;
+            padding: 5px 10px;
+            border-radius: 6px;
+            border: 1.5px solid rgba(180,143,212,0.5);
+            color: #5C4470;
+            background: transparent;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.1s;
+            margin-top: 8px;
+        }
+        .add-btn:hover { background: rgba(180,143,212,0.10); border-color: #B48FD4; }
+        .add-btn:active { transform: scale(0.95); }
+        .add-btn.btn-confirmed {
+            background: rgba(95,168,82,0.1);
+            border-color: #5fa852;
+            color: #3d7a32;
+        }
+
+        /* ── Price tag ── */
+        .price-tag {
+            font-family: 'Cormorant Garamond', serif;
+            font-weight: 600;
+            font-size: 17px;
+            color: #2A1A35;
+            letter-spacing: -0.01em;
+        }
+
+        /* ── Schedule grid ── */
+        .schedule-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            font-size: 12px;
+        }
+        .schedule-row:last-child { border-bottom: none; }
+        .schedule-closed { opacity: 0.38; font-style: italic; }
+
+        /* ── Scrollbar ── */
+        #cart-items-list::-webkit-scrollbar { width: 3px; }
+        #cart-items-list::-webkit-scrollbar-thumb { background: rgba(180,143,212,0.4); border-radius: 3px; }
+
+        img:not([src]), img[src=""] { display: none; }
+
+        /* ── Image placeholder ── */
+        .img-placeholder {
+            background: linear-gradient(135deg, #EEE4F8, #FAE8F0);
+            display: flex; align-items: center; justify-content: center;
+            color: rgba(180,143,212,0.5);
+            font-size: 22px;
+        }
+
+        /* ── WhatsApp button ── */
+        .wa-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #25D366;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 12px;
+            padding: 14px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.1s;
+            box-shadow: 0 2px 12px rgba(37,211,102,0.25);
+        }
+        .wa-btn:active { opacity: 0.9; transform: scale(0.98); }
+
+        /* ── Cart footer trigger ── */
+        .cart-trigger-btn {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #2A1A35;
+            color: white;
+            font-weight: 600;
+            padding: 14px 18px;
+            border-radius: 12px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.1s;
+        }
+        .cart-trigger-btn:active { opacity: 0.88; transform: scale(0.99); }
     </style>
 </head>
-<body class="bg-bakeryCream text-bakeryChoco font-sans min-h-screen pb-28 antialiased">
+<body>
 
-<!-- ═══════════════════════════════════════════
-     OVERLAY (behind cart drawer)
-════════════════════════════════════════════ -->
+<!-- ── OVERLAY ── -->
 <div id="cart-overlay"
-     class="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 hidden-overlay"
-     onclick="closeCart()">
-</div>
+     class="fixed inset-0 z-40 hidden-overlay"
+     style="background:rgba(42,26,53,0.5); backdrop-filter: blur(4px);"
+     onclick="closeCart()"></div>
 
-<!-- ═══════════════════════════════════════════
+<!-- ════════════════════════════════
      CART DRAWER
-════════════════════════════════════════════ -->
+════════════════════════════════ -->
 <div id="cart-drawer"
-     class="fixed bottom-0 inset-x-0 z-50 bg-bakeryCream rounded-t-3xl shadow-2xl max-w-md mx-auto hidden-drawer"
-     style="max-height: 82vh;">
+     class="fixed bottom-0 inset-x-0 z-50 max-w-md mx-auto hidden-drawer"
+     style="background:#FAF7FB; border-radius: 20px 20px 0 0; box-shadow: 0 -8px 40px rgba(42,26,53,0.18); max-height: 84vh; display: flex; flex-direction: column;">
 
-    <!-- Drawer handle -->
-    <div class="flex justify-center pt-3 pb-1">
-        <div class="w-10 h-1 rounded-full bg-bakeryChoco/20"></div>
+    <!-- Drag handle -->
+    <div style="display:flex; justify-content:center; padding: 12px 0 4px;">
+        <div style="width:36px; height:3px; background:rgba(42,26,53,0.15); border-radius:3px;"></div>
     </div>
 
-    <!-- Drawer header -->
-    <div class="flex items-center justify-between px-5 pt-2 pb-3 border-b border-bakeryChoco/10">
+    <!-- Header -->
+    <div style="display:flex; align-items:center; justify-content:space-between; padding: 8px 20px 14px; border-bottom: 1px solid rgba(180,143,212,0.18);">
         <div>
-            <h2 class="text-xl font-bold font-serif text-bakeryChoco">Tu Pedido 🧺</h2>
-            <p id="cart-item-count-label" class="text-xs text-bakeryChoco/50 mt-0.5">0 productos</p>
+            <h2 class="font-serif" style="font-size:22px; font-weight:600; color:#2A1A35; letter-spacing:-0.01em;">Tu pedido</h2>
+            <p id="cart-item-count-label" style="font-size:11px; color:rgba(42,26,53,0.45); margin-top:2px;">0 productos</p>
         </div>
         <button onclick="closeCart()"
-                class="w-8 h-8 rounded-full bg-bakeryChoco/8 flex items-center justify-center text-bakeryChoco/60 hover:bg-bakeryChoco/15 transition-colors text-lg font-bold">
-            ✕
-        </button>
+                style="width:32px; height:32px; border-radius:50%; background:rgba(180,143,212,0.12); border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:13px; color:rgba(42,26,53,0.5);">✕</button>
     </div>
 
     <!-- Empty state -->
-    <div id="cart-empty" class="flex flex-col items-center justify-center py-12 px-6 text-center">
-        <div class="text-5xl mb-3">🥧</div>
-        <p class="font-serif text-lg text-bakeryChoco/60 italic">Tu carrito está vacío</p>
-        <p class="text-xs text-bakeryChoco/40 mt-1">Agrega algo delicioso del menú</p>
+    <div id="cart-empty" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding: 48px 24px; text-align:center;">
+        <div style="width:48px; height:48px; border-radius:50%; background:rgba(180,143,212,0.12); display:flex; align-items:center; justify-content:center; margin-bottom:12px; font-size:20px;">○</div>
+        <p class="font-serif" style="font-size:18px; color:rgba(42,26,53,0.45); font-style:italic;">Carrito vacío</p>
+        <p style="font-size:12px; color:rgba(42,26,53,0.3); margin-top:4px;">Agrega productos del menú</p>
     </div>
 
-    <!-- Cart items -->
-    <div id="cart-items-list" class="overflow-y-auto px-4 py-2 space-y-2" style="max-height: 44vh; display:none;">
-        <!-- rows injected by JS -->
-    </div>
+    <!-- Items -->
+    <div id="cart-items-list" style="flex:1; overflow-y:auto; padding: 8px 16px; display:none;"></div>
 
-    <!-- Cart footer -->
-    <div id="cart-footer" class="px-5 pt-3 pb-5 border-t border-bakeryChoco/10 space-y-3" style="display:none;">
-        <!-- Subtotal -->
-        <div class="flex justify-between items-center">
-            <span class="text-sm font-semibold text-bakeryChoco/70">Total del pedido</span>
-            <span id="cart-total" class="font-extrabold text-lg text-bakeryChoco font-serif">MX$0</span>
+    <!-- Footer -->
+    <div id="cart-footer" style="padding: 14px 20px 20px; border-top: 1px solid rgba(180,143,212,0.18); display:none;">
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;">
+            <span style="font-size:12px; color:rgba(42,26,53,0.5); font-weight:500; text-transform:uppercase; letter-spacing:0.06em;">Total</span>
+            <span id="cart-total" class="font-serif" style="font-size:24px; font-weight:600; color:#2A1A35;">MX$0</span>
         </div>
-        <!-- Clear + Checkout row -->
-        <div class="flex gap-2">
+        <div style="display:flex; gap:8px;">
             <button onclick="clearCart()"
-                    class="flex-none px-4 py-3 rounded-xl border border-bakeryChoco/20 text-bakeryChoco/60 text-xs font-bold hover:bg-bakeryChoco/5 transition-colors">
+                    style="padding: 12px 16px; border-radius:10px; border: 1px solid rgba(180,143,212,0.35); background:transparent; color:rgba(42,26,53,0.5); font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;">
                 Vaciar
             </button>
-            <button onclick="sendWhatsAppOrder()"
-                    class="flex-1 flex items-center justify-center gap-2 bg-whatsappGreen text-white font-extrabold py-3 rounded-xl text-sm shadow-md active:scale-95 transition-transform">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/><path d="M12 0C5.373 0 0 5.373 0 12c0 2.109.549 4.09 1.508 5.815L0 24l6.348-1.485A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.797 9.797 0 01-5.001-1.371l-.357-.213-3.769.882.915-3.667-.234-.376A9.768 9.768 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/></svg>
-                Enviar Pedido por WhatsApp
+            <button onclick="sendWhatsAppOrder()" class="wa-btn" style="border-radius:10px; font-size:13px;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;flex-shrink:0;">
+                    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                    <path d="M12 0C5.373 0 0 5.373 0 12c0 2.109.549 4.09 1.508 5.815L0 24l6.348-1.485A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.797 9.797 0 01-5.001-1.371l-.357-.213-3.769.882.915-3.667-.234-.376A9.768 9.768 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/>
+                </svg>
+                Enviar pedido por WhatsApp
             </button>
         </div>
-        <p class="text-center text-[10px] text-bakeryChoco/35">Te contactaremos para confirmar disponibilidad y entrega.</p>
+        <p style="text-align:center; font-size:10px; color:rgba(42,26,53,0.28); margin-top:10px;">Confirmaremos disponibilidad y forma de entrega.</p>
     </div>
 </div>
 
 
-<!-- ═══════════════════════════════════════════
-     STICKY HEADER
-════════════════════════════════════════════ -->
-<header class="sticky top-0 z-30 bg-[#FAF6F0]/90 backdrop-blur-md border-b border-bakeryChoco/10 px-4 py-3 flex items-center justify-between shadow-sm">
+<!-- ════════════════════════════════
+     HEADER
+════════════════════════════════ -->
+<header style="position:sticky; top:0; z-index:30; background:rgba(250,247,251,0.92); backdrop-filter:blur(12px); border-bottom:1px solid rgba(180,143,212,0.15); padding:12px 16px; display:flex; align-items:center; justify-content:space-between; box-shadow:0 1px 0 rgba(180,143,212,0.1);">
     <div>
-        <h1 class="text-xl font-extrabold tracking-tight font-serif text-bakeryChoco">El hada de los pays</h1>
-        <div class="flex items-center gap-1 mt-0.5">
-            <span class="text-amber-500 text-xs">★★★★★</span>
-            <span class="text-[10px] font-bold uppercase tracking-wider text-bakeryChoco/60">5.0 de Calificación</span>
+        <h1 class="font-serif" style="font-size:20px; font-weight:600; letter-spacing:-0.02em; color:#2A1A35; line-height:1.2;">El hada de los pays</h1>
+        <div style="display:flex; align-items:center; gap:5px; margin-top:2px;">
+            <span style="color:#B48FD4; font-size:11px; letter-spacing:1px;">★★★★★</span>
+            <span style="font-size:10px; font-weight:500; text-transform:uppercase; letter-spacing:0.07em; color:rgba(42,26,53,0.38);">Celaya, Gto.</span>
         </div>
     </div>
-    <!-- Cart button in header -->
-    <button id="header-cart-btn"
-            onclick="openCart()"
-            class="relative flex items-center gap-1.5 bg-bakeryChoco text-bakeryCream font-bold py-2 px-3.5 rounded-full text-xs transition-all shadow-sm active:scale-95 hover:bg-bakeryChoco/85">
-        <span>🧺</span>
-        <span>Mi Carrito</span>
+    <button id="header-cart-btn" onclick="openCart()"
+            style="position:relative; display:flex; align-items:center; gap:6px; background:#2A1A35; color:white; font-weight:600; font-size:12px; padding:8px 14px; border-radius:50px; border:none; cursor:pointer; transition:opacity 0.15s;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:14px;height:14px;"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+        Carrito
         <span id="header-badge"
-              class="absolute -top-1.5 -right-1.5 bg-bakeryOrange text-white text-[10px] font-extrabold w-5 h-5 rounded-full flex items-center justify-center leading-none"
-              style="display:none;">0</span>
+              style="position:absolute; top:-6px; right:-6px; background:#B48FD4; color:white; font-size:10px; font-weight:700; width:18px; height:18px; border-radius:50%; display:none; align-items:center; justify-content:center; line-height:1;">0</span>
     </button>
 </header>
 
 
-<!-- ═══════════════════════════════════════════
+<!-- ════════════════════════════════
      HERO
-════════════════════════════════════════════ -->
-<section class="relative bg-bakeryChoco text-white overflow-hidden">
+════════════════════════════════ -->
+<section style="position:relative; overflow:hidden; background:#2A1A35;">
     <img src="https://images.unsplash.com/photo-1509440159596-0249088772ff?auto=format&fit=crop&w=800&q=80"
-         alt="Panadería Artesanal"
-         class="w-full h-48 object-cover opacity-40" />
-    <div class="absolute inset-0 bg-gradient-to-t from-bakeryChoco via-bakeryChoco/20 to-transparent"></div>
-    <div class="absolute bottom-0 inset-x-0 p-5 text-center">
-        <h2 class="text-2xl font-bold font-serif mb-1 text-bakeryCream">Nuestro Catálogo Exclusivo</h2>
-        <p class="text-xs text-bakeryCream/80 font-light max-w-sm mx-auto">Agrega tus favoritos al carrito y envíanos tu pedido completo por WhatsApp.</p>
+         alt="Panadería"
+         style="width:100%; height:200px; object-fit:cover; opacity:0.28; display:block;" />
+    <div style="position:absolute; inset:0; background:linear-gradient(to top, #2A1A35 0%, rgba(42,26,53,0.6) 50%, transparent 100%);"></div>
+    <div style="position:absolute; bottom:0; left:0; right:0; padding:20px 20px 24px; text-align:center;">
+        <p style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.12em; color:rgba(180,143,212,0.8); margin-bottom:6px;">Artesanal · Hecho con amor</p>
+        <h2 class="font-serif" style="font-size:26px; font-weight:600; color:white; line-height:1.2; margin-bottom:6px;">Catálogo de productos</h2>
+        <p style="font-size:12px; color:rgba(255,255,255,0.55); max-width:300px; margin:0 auto;">Selecciona tus favoritos, arma tu pedido y envíalo en un solo mensaje.</p>
     </div>
 </section>
 
 
-<!-- ═══════════════════════════════════════════
-     MAIN MENU
-════════════════════════════════════════════ -->
-<main class="p-4 max-w-md mx-auto space-y-8">
-
-    <!-- SECTION: PAYS -->
-    <div class="space-y-3">
-        <h3 class="text-lg font-bold font-serif text-bakeryChoco border-b-2 border-bakeryGold pb-1 mb-2 flex justify-between items-center">
-            <span>Nuestros Pays Artesanales</span>
-            <span class="text-xs font-sans text-bakeryGold font-bold uppercase">Pieza Entera</span>
-        </h3>
-
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3"
-             data-id="pay-manzana" data-name="Pay de Manzana" data-price="100">
-            <img src="pay-manzana.jpg" alt="Pay de Manzana" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline">
-                    <h4 class="font-bold text-sm truncate">Pay de Manzana</h4>
-                    <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$100</span>
-                </div>
-                <p class="text-xs text-bakeryChoco/60 line-clamp-1 mt-0.5">Pasta de hojaldre tradicional y manzana selecta.</p>
-                <button class="add-btn inline-flex items-center text-[10px] bg-bakeryChoco text-bakeryCream font-bold px-2.5 py-1 rounded-lg mt-1.5 gap-1 transition-all active:scale-95"
-                        onclick="addToCart(this)">
-                    <span class="btn-icon">＋</span> Agregar al carrito
-                </button>
-            </div>
+<!-- ════════════════════════════════
+     STATUS BAR
+════════════════════════════════ -->
+<div id="status-bar" style="max-width:448px; margin:0 auto; padding:0 16px; margin-top:12px;">
+    <div id="status-pill" style="display:flex; align-items:center; justify-content:space-between; padding:10px 14px; border-radius:10px; font-size:12px; font-weight:500;">
+        <div style="display:flex; align-items:center; gap:8px;">
+            <span id="status-dot" style="width:7px; height:7px; border-radius:50%; flex-shrink:0;"></span>
+            <span id="status-text"></span>
         </div>
+        <span id="status-sub" style="font-size:11px; opacity:0.65;"></span>
+    </div>
+</div>
 
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3"
-             data-id="pay-atun" data-name="Pay de Atún" data-price="100">
-            <img src="pay-atun.jpg" alt="Pay de Atún" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline">
-                    <h4 class="font-bold text-sm truncate">Pay de Atún</h4>
-                    <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$100</span>
-                </div>
-                <p class="text-xs text-bakeryChoco/60 line-clamp-1 mt-0.5">Pasta de hojaldre y atún guisado a la mexicana.</p>
-                <button class="add-btn inline-flex items-center text-[10px] bg-bakeryChoco text-bakeryCream font-bold px-2.5 py-1 rounded-lg mt-1.5 gap-1 transition-all active:scale-95"
-                        onclick="addToCart(this)">
-                    <span class="btn-icon">＋</span> Agregar al carrito
-                </button>
-            </div>
+<script>
+(function() {
+    const now = new Date();
+    const day = now.getDay(); // 0=Sun,1=Mon...6=Sat
+    const h = now.getHours(), m = now.getMinutes();
+    const mins = h * 60 + m;
+
+    // [open_start_mins, open_end_mins, next_open_label]
+    const schedule = {
+        0: null,                        // Sunday: closed
+        1: [600, 1020, ''],             // Mon 10am-5pm
+        2: [600, 1020, ''],             // Tue 10am-5pm
+        3: [600,  900, ''],             // Wed 10am-3pm
+        4: [720,  960, ''],             // Thu 12pm-4pm
+        5: [600, 1020, ''],             // Fri 10am-5pm
+        6: [600, 1020, ''],             // Sat 10am-5pm
+    };
+
+    const pill = document.getElementById('status-pill');
+    const dot  = document.getElementById('status-dot');
+    const txt  = document.getElementById('status-text');
+    const sub  = document.getElementById('status-sub');
+
+    const todaySchedule = schedule[day];
+    let isOpen = false;
+
+    if (todaySchedule) {
+        const [start, end] = todaySchedule;
+        isOpen = mins >= start && mins < end;
+    }
+
+    if (isOpen) {
+        pill.style.background = 'rgba(95,168,82,0.10)';
+        pill.style.border = '1px solid rgba(95,168,82,0.25)';
+        dot.style.background = '#5fa852';
+        dot.style.boxShadow = '0 0 0 3px rgba(95,168,82,0.2)';
+        txt.style.color = '#2d6624';
+        txt.textContent = 'Abierto ahora';
+        sub.style.color = '#2d6624';
+        const [, end] = todaySchedule;
+        const eh = Math.floor(end / 60), em = end % 60;
+        const suffix = eh >= 12 ? 'PM' : 'AM';
+        const dh = eh > 12 ? eh - 12 : eh;
+        sub.textContent = `Cierra a las ${dh}:${em.toString().padStart(2,'0')} ${suffix}`;
+    } else {
+        pill.style.background = 'rgba(42,26,53,0.05)';
+        pill.style.border = '1px solid rgba(42,26,53,0.1)';
+        dot.style.background = 'rgba(42,26,53,0.3)';
+        txt.style.color = 'rgba(42,26,53,0.6)';
+        txt.textContent = 'Cerrado en este momento';
+        sub.style.color = 'rgba(42,26,53,0.4)';
+        // Find next open day
+        const days = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+        for (let i = 1; i <= 7; i++) {
+            const nextDay = (day + i) % 7;
+            if (schedule[nextDay]) {
+                const [start] = schedule[nextDay];
+                const sh = Math.floor(start / 60);
+                const suffix = sh >= 12 ? 'PM' : 'AM';
+                const dh = sh > 12 ? sh - 12 : sh;
+                sub.textContent = `Próxima apertura: ${days[nextDay]} ${dh}:00 ${suffix}`;
+                break;
+            }
+        }
+    }
+})();
+</script>
+
+<!-- ════════════════════════════════
+     MENU
+════════════════════════════════ -->
+<main style="padding:16px 16px 20px; max-width:448px; margin:0 auto;">
+
+    <!-- helper macro: every card uses this exact structure -->
+
+    <!-- ══ PAYS DULCES ══ -->
+    <div style="margin-bottom:32px;">
+        <div class="section-heading">
+            <h3 class="font-serif" style="font-size:20px; font-weight:600; color:#9B6DC5; white-space:nowrap; letter-spacing:-0.01em;">Pays dulces</h3>
         </div>
+        <p style="font-size:11px; color:rgba(42,26,53,0.4); margin-bottom:12px; margin-top:-8px;">5 variedades · Pieza entera</p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
 
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3"
-             data-id="pay-fresa" data-name="Pay de Fresa" data-price="100">
-            <img src="pay-fresa.jpg" alt="Pay de Fresa" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline">
-                    <h4 class="font-bold text-sm truncate">Pay de Fresa</h4>
-                    <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$100</span>
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="pay-strudel-manzana" data-name="Strudel de manzana" data-price="130">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;overflow:hidden;text-overflow:ellipsis;padding-right:8px;">Strudel de manzana</h4>
+                        <span class="price-tag">MX$130</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
                 </div>
-                <p class="text-xs text-bakeryChoco/60 line-clamp-1 mt-0.5">Pay de queso cremoso con fresas frescas.</p>
-                <button class="add-btn inline-flex items-center text-[10px] bg-bakeryChoco text-bakeryCream font-bold px-2.5 py-1 rounded-lg mt-1.5 gap-1 transition-all active:scale-95"
-                        onclick="addToCart(this)">
-                    <span class="btn-icon">＋</span> Agregar al carrito
-                </button>
             </div>
-        </div>
 
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3"
-             data-id="pay-chocolate" data-name="Pay de Chocolate" data-price="100">
-            <img src="pay-chocolate.jpg" alt="Pay de Chocolate" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline">
-                    <h4 class="font-bold text-sm truncate">Pay de Chocolate</h4>
-                    <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$100</span>
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="pay-queso" data-name="Pay de queso" data-price="130">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pay de queso</h4>
+                        <span class="price-tag">MX$130</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
                 </div>
-                <p class="text-xs text-bakeryChoco/60 line-clamp-1 mt-0.5">Pay de queso suave con una rica cubierta de chocolate.</p>
-                <button class="add-btn inline-flex items-center text-[10px] bg-bakeryChoco text-bakeryCream font-bold px-2.5 py-1 rounded-lg mt-1.5 gap-1 transition-all active:scale-95"
-                        onclick="addToCart(this)">
-                    <span class="btn-icon">＋</span> Agregar al carrito
-                </button>
             </div>
-        </div>
 
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3"
-             data-id="pay-choco-fresas" data-name="Pay de Chocolate con Fresas" data-price="100">
-            <img src="pay-chocolate-fresas.jpg" alt="Pay de Chocolate con Fresas" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline">
-                    <h4 class="font-bold text-sm truncate">Pay de Chocolate con Fresas</h4>
-                    <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$100</span>
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;position:relative;"
+                 data-id="pay-queso-fruta-choco" data-name="Pay de queso con fruta y/o chocolate" data-price="140">
+                <div style="position:absolute;top:-1px;right:10px;background:#9B6DC5;color:white;font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 8px;border-radius:0 0 6px 6px;text-transform:uppercase;">Más pedido</div>
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;overflow:hidden;text-overflow:ellipsis;padding-right:8px;">Pay de queso con fruta y/o chocolate</h4>
+                        <span class="price-tag">MX$140</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
                 </div>
-                <p class="text-xs text-bakeryChoco/60 line-clamp-1 mt-0.5">Pay de queso premium con cubierta de chocolate y fresas.</p>
-                <button class="add-btn inline-flex items-center text-[10px] bg-bakeryChoco text-bakeryCream font-bold px-2.5 py-1 rounded-lg mt-1.5 gap-1 transition-all active:scale-95"
-                        onclick="addToCart(this)">
-                    <span class="btn-icon">＋</span> Agregar al carrito
-                </button>
             </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="pay-guayaba" data-name="Pay de guayaba" data-price="140">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pay de guayaba</h4>
+                        <span class="price-tag">MX$140</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="pay-pina" data-name="Pay de piña" data-price="140">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pay de piña</h4>
+                        <span class="price-tag">MX$140</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- SECTION: MUFFINS -->
-    <div class="space-y-3">
-        <h3 class="text-lg font-bold font-serif text-bakeryChoco border-b-2 border-bakeryGold pb-1 mb-2">
-            Muffins Esponjosos (Por Caja)
-        </h3>
-
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3"
-             data-id="muffin-platano" data-name="Muffin Plátano con Arándanos (caja 4 pzas)" data-price="50">
-            <img src="muffin-platano.jpg" alt="Muffin de Plátano con Arándanos" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline">
-                    <h4 class="font-bold text-sm truncate">Muffin Plátano con Arándanos</h4>
-                    <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$50</span>
-                </div>
-                <p class="text-xs text-bakeryOrange font-bold mt-0.5">Caja con 4 piezas</p>
-                <button class="add-btn inline-flex items-center text-[10px] bg-bakeryChoco text-bakeryCream font-bold px-2.5 py-1 rounded-lg mt-1.5 gap-1 transition-all active:scale-95"
-                        onclick="addToCart(this)">
-                    <span class="btn-icon">＋</span> Agregar al carrito
-                </button>
-            </div>
+    <!-- ══ PAYS SALADOS ══ -->
+    <div style="margin-bottom:32px;">
+        <div class="section-heading">
+            <h3 class="font-serif" style="font-size:20px; font-weight:600; color:#9B6DC5; white-space:nowrap; letter-spacing:-0.01em;">Pays salados</h3>
         </div>
+        <p style="font-size:11px; color:rgba(42,26,53,0.4); margin-bottom:12px; margin-top:-8px;">4 variedades · Pieza entera</p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
 
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3"
-             data-id="muffin-zanahoria-4" data-name="Muffin de Zanahoria (caja 4 pzas)" data-price="40">
-            <img src="muffin-zanahoria-4.jpg" alt="Muffin de Zanahoria 4 pzas" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline">
-                    <h4 class="font-bold text-sm truncate">Muffin de Zanahoria</h4>
-                    <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$40</span>
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="pay-jamon-queso" data-name="Pay de jamón con queso" data-price="130">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pay de jamón con queso</h4>
+                        <span class="price-tag">MX$130</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
                 </div>
-                <p class="text-xs text-bakeryOrange font-bold mt-0.5">Caja con 4 piezas</p>
-                <button class="add-btn inline-flex items-center text-[10px] bg-bakeryChoco text-bakeryCream font-bold px-2.5 py-1 rounded-lg mt-1.5 gap-1 transition-all active:scale-95"
-                        onclick="addToCart(this)">
-                    <span class="btn-icon">＋</span> Agregar al carrito
-                </button>
             </div>
-        </div>
 
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3"
-             data-id="muffin-zanahoria-nuez" data-name="Muffin de Zanahoria con Nuez (caja 4 pzas)" data-price="50">
-            <img src="muffin-zanahoria-nuez.jpg" alt="Muffin de Zanahoria con Nuez" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline">
-                    <h4 class="font-bold text-sm truncate">Muffin de Zanahoria con Nuez</h4>
-                    <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$50</span>
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="pay-atun" data-name="Pay de atún" data-price="130">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pay de atún</h4>
+                        <span class="price-tag">MX$130</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
                 </div>
-                <p class="text-xs text-bakeryOrange font-bold mt-0.5">Caja con 4 piezas</p>
-                <button class="add-btn inline-flex items-center text-[10px] bg-bakeryChoco text-bakeryCream font-bold px-2.5 py-1 rounded-lg mt-1.5 gap-1 transition-all active:scale-95"
-                        onclick="addToCart(this)">
-                    <span class="btn-icon">＋</span> Agregar al carrito
-                </button>
             </div>
-        </div>
 
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3"
-             data-id="muffin-zanahoria-8" data-name="Muffin de Zanahoria Grandes (caja familiar 8 pzas)" data-price="75">
-            <img src="muffin-zanahoria-8.jpg" alt="Muffin de Zanahoria 8 pzas" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline">
-                    <h4 class="font-bold text-sm truncate">Muffin de Zanahoria Grandes</h4>
-                    <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$75</span>
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="pay-espinacas-queso" data-name="Pay de espinacas con queso" data-price="130">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pay de espinacas con queso</h4>
+                        <span class="price-tag">MX$130</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
                 </div>
-                <p class="text-xs text-bakeryOrange font-bold mt-0.5">Caja Familiar con 8 piezas</p>
-                <button class="add-btn inline-flex items-center text-[10px] bg-bakeryChoco text-bakeryCream font-bold px-2.5 py-1 rounded-lg mt-1.5 gap-1 transition-all active:scale-95"
-                        onclick="addToCart(this)">
-                    <span class="btn-icon">＋</span> Agregar al carrito
-                </button>
             </div>
-        </div>
 
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3"
-             data-id="muffin-zanahoria-arandano" data-name="Muffin Zanahoria con Arándano (caja grande 12 pzas)" data-price="120">
-            <img src="muffin-zanahoria-arandano.jpg" alt="Muffin de Zanahoria con Arándano" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline">
-                    <h4 class="font-bold text-sm truncate">Muffin Zanahoria con Arándano</h4>
-                    <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$120</span>
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="pay-champinones-queso" data-name="Pay de champiñones con queso" data-price="130">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pay de champiñones con queso</h4>
+                        <span class="price-tag">MX$130</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
                 </div>
-                <p class="text-xs text-bakeryOrange font-bold mt-0.5">Caja Grande con 12 piezas</p>
-                <button class="add-btn inline-flex items-center text-[10px] bg-bakeryChoco text-bakeryCream font-bold px-2.5 py-1 rounded-lg mt-1.5 gap-1 transition-all active:scale-95"
-                        onclick="addToCart(this)">
-                    <span class="btn-icon">＋</span> Agregar al carrito
-                </button>
             </div>
+
         </div>
     </div>
 
-    <!-- SECTION: ESPECIALIDADES -->
-    <div class="space-y-3">
-        <h3 class="text-lg font-bold font-serif text-bakeryChoco border-b-2 border-bakeryGold pb-1 mb-2">
-            Especialidades de la Casa
-        </h3>
-
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3"
-             data-id="besos-nuez" data-name="Besos de Nuez" data-price="45">
-            <img src="besos-nuez.jpg" alt="Besos de Nuez" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline">
-                    <h4 class="font-bold text-sm truncate">Besos de Nuez</h4>
-                    <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$45</span>
-                </div>
-                <p class="text-xs text-bakeryChoco/60 line-clamp-1 mt-0.5">Galletas finas de nuez espolvoreadas con azúcar glass.</p>
-                <button class="add-btn inline-flex items-center text-[10px] bg-bakeryChoco text-bakeryCream font-bold px-2.5 py-1 rounded-lg mt-1.5 gap-1 transition-all active:scale-95"
-                        onclick="addToCart(this)">
-                    <span class="btn-icon">＋</span> Agregar al carrito
-                </button>
-            </div>
+    <!-- ══ PANQUÉ ══ -->
+    <div style="margin-bottom:32px;">
+        <div class="section-heading">
+            <h3 class="font-serif" style="font-size:20px; font-weight:600; color:#9B6DC5; white-space:nowrap; letter-spacing:-0.01em;">Panqué</h3>
         </div>
+        <p style="font-size:11px; color:rgba(42,26,53,0.4); margin-bottom:12px; margin-top:-8px;">6 sabores · MX$160 c/u</p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
 
-        <div class="bg-white p-3 rounded-xl shadow-sm border border-bakeryChoco/5 flex items-center gap-3"
-             data-id="salsa-artesanal" data-name="Salsa Artesanal de la Casa" data-price="100">
-            <img src="salsa-artesanal.jpg" alt="Salsa Artesanal" class="w-16 h-16 rounded-lg object-cover shrink-0 bg-bakeryCream">
-            <div class="flex-1 min-w-0">
-                <div class="flex justify-between items-baseline">
-                    <h4 class="font-bold text-sm truncate">Salsa Artesanal de la Casa</h4>
-                    <span class="font-extrabold text-sm text-bakeryChoco shrink-0">MX$100</span>
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="panque-elote" data-name="Panqué de elote" data-price="160">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Panqué de elote</h4>
+                        <span class="price-tag">MX$160</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
                 </div>
-                <p class="text-xs text-bakeryChoco/60 line-clamp-1 mt-0.5">Deliciosa salsa de chiltepín o chile de árbol elaborado en casa.</p>
-                <button class="add-btn inline-flex items-center text-[10px] bg-bakeryChoco text-bakeryCream font-bold px-2.5 py-1 rounded-lg mt-1.5 gap-1 transition-all active:scale-95"
-                        onclick="addToCart(this)">
-                    <span class="btn-icon">＋</span> Agregar al carrito
-                </button>
             </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="panque-platano" data-name="Panqué de plátano" data-price="160">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Panqué de plátano</h4>
+                        <span class="price-tag">MX$160</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="panque-zanahoria" data-name="Panqué de zanahoria" data-price="160">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Panqué de zanahoria</h4>
+                        <span class="price-tag">MX$160</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="panque-naranja" data-name="Panqué de naranja" data-price="160">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Panqué de naranja</h4>
+                        <span class="price-tag">MX$160</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="panque-nuez" data-name="Panqué de nuez" data-price="160">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Panqué de nuez</h4>
+                        <span class="price-tag">MX$160</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="panque-marmoleado" data-name="Panqué marmoleado" data-price="160">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Panqué marmoleado</h4>
+                        <span class="price-tag">MX$160</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <!-- DIRECCION Y HORARIOS -->
-    <section class="bg-bakeryChoco text-bakeryCream p-5 rounded-2xl space-y-4 shadow-md">
-        <div class="space-y-1">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-bakeryGold">Visítanos en Celaya</h4>
-            <p class="text-sm font-semibold">Lic Andrés Quintana Roo 721-2</p>
-            <p class="text-xs text-bakeryCream/70">Las Fuentes, Celaya, Guanajuato.</p>
+    <!-- ══ GALLETAS ══ -->
+    <div style="margin-bottom:32px;">
+        <div class="section-heading">
+            <h3 class="font-serif" style="font-size:20px; font-weight:600; color:#9B6DC5; white-space:nowrap; letter-spacing:-0.01em;">Galletas</h3>
         </div>
-        <div class="border-t border-bakeryCream/10 pt-3 space-y-1">
-            <h4 class="text-xs font-bold uppercase tracking-wider text-bakeryGold">Horario del Horno</h4>
-            <p class="text-xs">Lunes a Sábado: <span class="font-semibold text-bakeryOrange">10:00 AM - 5:00 PM</span></p>
-            <p class="text-xs text-bakeryCream/60">(Los Miércoles cerramos temprano a las 3:00 PM)</p>
-            <p class="text-xs text-bakeryCream/40 italic mt-1">Jueves y Domingo: Cerrado por descanso</p>
+        <p style="font-size:11px; color:rgba(42,26,53,0.4); margin-bottom:12px; margin-top:-8px;">4 variedades</p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="galletas-mantequilla" data-name="Galletas de mantequilla" data-price="160">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Galletas de mantequilla</h4>
+                        <span class="price-tag">MX$160</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="galletas-encaneladas" data-name="Galletas encaneladas" data-price="160">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Galletas encaneladas</h4>
+                        <span class="price-tag">MX$160</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;position:relative;"
+                 data-id="besos-nuez" data-name="Besos de nuez" data-price="160">
+                <div style="position:absolute;top:-1px;right:10px;background:#9B6DC5;color:white;font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 8px;border-radius:0 0 6px 6px;text-transform:uppercase;">Favorita</div>
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Besos de nuez</h4>
+                        <span class="price-tag">MX$160</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="galletas-avena" data-name="Galletas de avena" data-price="130">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Galletas de avena</h4>
+                        <span class="price-tag">MX$130</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
         </div>
-    </section>
+    </div>
+
+    <!-- ══ OTRAS DELICIAS ══ -->
+    <div style="margin-bottom:32px;">
+        <div class="section-heading">
+            <h3 class="font-serif" style="font-size:20px; font-weight:600; color:#9B6DC5; white-space:nowrap; letter-spacing:-0.01em;">Otras delicias</h3>
+        </div>
+        <p style="font-size:11px; color:rgba(42,26,53,0.4); margin-bottom:12px; margin-top:-8px;">7 productos</p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="brownies" data-name="Brownies" data-price="130">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Brownies</h4>
+                        <span class="price-tag">MX$130</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="roles-canela" data-name="Roles de canela" data-price="35">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Roles de canela</h4>
+                        <span class="price-tag">MX$35</span>
+                    </div>
+                    <p style="font-size:11px;color:rgba(42,26,53,0.45);margin-top:2px;">Por pieza</p>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="roles-canela-topping" data-name="Roles de canela con topping" data-price="40">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Roles de canela con topping</h4>
+                        <span class="price-tag">MX$40</span>
+                    </div>
+                    <p style="font-size:11px;color:rgba(42,26,53,0.45);margin-top:2px;">Por pieza</p>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="bunuelos-aire" data-name="Buñuelos de aire (20 piezas)" data-price="140">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Buñuelos de aire</h4>
+                        <span class="price-tag">MX$140</span>
+                    </div>
+                    <p style="font-size:11px;color:rgba(92,68,112,0.7);font-weight:500;margin-top:2px;">20 piezas</p>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="tartaleta-frutas-individual" data-name="Tartaleta con frutas (individual)" data-price="45">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Tartaleta con frutas</h4>
+                        <span class="price-tag">MX$45</span>
+                    </div>
+                    <p style="font-size:11px;color:rgba(42,26,53,0.45);margin-top:2px;">Individual</p>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="alfajores" data-name="Alfajores (6 piezas)" data-price="120">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Alfajores</h4>
+                        <span class="price-tag">MX$120</span>
+                    </div>
+                    <p style="font-size:11px;color:rgba(92,68,112,0.7);font-weight:500;margin-top:2px;">6 piezas</p>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ══ PASTELES ══ -->
+    <div style="margin-bottom:32px;">
+        <div class="section-heading">
+            <h3 class="font-serif" style="font-size:20px; font-weight:600; color:#9B6DC5; white-space:nowrap; letter-spacing:-0.01em;">Pasteles</h3>
+        </div>
+        <p style="font-size:11px; color:rgba(42,26,53,0.4); margin-bottom:12px; margin-top:-8px;">5 creaciones · Bajo pedido</p>
+        <div style="display:flex; flex-direction:column; gap:10px;">
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;position:relative;"
+                 data-id="cheesecake-tortuga" data-name="Cheesecake tortuga" data-price="400">
+                <div style="position:absolute;top:-1px;right:10px;background:#9B6DC5;color:white;font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 8px;border-radius:0 0 6px 6px;text-transform:uppercase;">Más pedido</div>
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Cheesecake tortuga</h4>
+                        <span class="price-tag">MX$400</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="tartaleta-frutas-entera" data-name="Tartaleta con frutas (entera)" data-price="350">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Tartaleta con frutas</h4>
+                        <span class="price-tag">MX$350</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="pastel-tres-leches" data-name="Pastel de tres leches" data-price="450">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pastel de tres leches</h4>
+                        <span class="price-tag">MX$450</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="pastel-red-velvet" data-name="Pastel de red velvet" data-price="400">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pastel de red velvet</h4>
+                        <span class="price-tag">MX$400</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+                 data-id="imposible-elote" data-name="Imposible de elote" data-price="450">
+                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Imposible de elote</h4>
+                        <span class="price-tag">MX$450</span>
+                    </div>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ── INFO CARD ── -->
+    <div style="background:#2A1A35; border-radius:18px; padding:20px; color:white;">
+        <!-- Address -->
+        <div style="margin-bottom:16px;">
+            <p style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:rgba(180,143,212,0.7); margin-bottom:5px;">Ubicación</p>
+            <p style="font-size:14px; font-weight:600; color:white;">Lic. Andrés Quintana Roo 721-2</p>
+            <p style="font-size:12px; color:rgba(255,255,255,0.45); margin-top:2px;">Las Fuentes, Celaya, Guanajuato</p>
+        </div>
+
+        <div style="height:1px; background:rgba(255,255,255,0.08); margin-bottom:16px;"></div>
+
+        <!-- Schedule -->
+        <div>
+            <p style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.1em; color:rgba(180,143,212,0.7); margin-bottom:10px;">Horario</p>
+
+            <div class="schedule-row">
+                <span style="color:rgba(255,255,255,0.65);">Lunes – Martes</span>
+                <span style="font-weight:500; color:white;">10:00 AM – 5:00 PM</span>
+            </div>
+            <div class="schedule-row">
+                <span style="color:rgba(255,255,255,0.65);">Miércoles</span>
+                <span style="font-weight:500; color:white;">10:00 AM – 3:00 PM</span>
+            </div>
+            <div class="schedule-row">
+                <span style="color:rgba(255,255,255,0.65);">Jueves</span>
+                <span style="font-weight:500; color:white;">12:00 PM – 4:00 PM</span>
+            </div>
+            <div class="schedule-row">
+                <span style="color:rgba(255,255,255,0.65);">Viernes – Sábado</span>
+                <span style="font-weight:500; color:white;">10:00 AM – 5:00 PM</span>
+            </div>
+            <div class="schedule-row schedule-closed">
+                <span style="color:rgba(255,255,255,0.35);">Domingo</span>
+                <span style="color:rgba(255,255,255,0.3);">Cerrado</span>
+            </div>
+        </div>
+    </div>
 
 </main>
 
 
-<!-- ═══════════════════════════════════════════
-     STICKY FOOTER — cart summary bar
-════════════════════════════════════════════ -->
-<footer class="fixed bottom-0 inset-x-0 bg-white border-t border-bakeryChoco/10 p-3 z-30 shadow-[0_-4px_12px_rgba(0,0,0,0.05)] max-w-md mx-auto">
+<!-- ════════════════════════════════
+     STICKY FOOTER
+════════════════════════════════ -->
+<footer style="position:fixed; bottom:0; left:0; right:0; z-index:29; max-width:448px; margin:0 auto; background:rgba(250,247,251,0.96); backdrop-filter:blur(12px); border-top:1px solid rgba(180,143,212,0.15); padding:12px 16px; box-shadow:0 -2px 16px rgba(42,26,53,0.08);">
 
-    <!-- Empty state footer -->
     <div id="footer-empty">
         <a href="https://wa.me/524613504042?text=Hola!%20Me%20gustaría%20conocer%20la%20variedad%20del%20día."
-           class="flex items-center justify-center gap-2 bg-whatsappGreen text-white font-extrabold py-3.5 rounded-xl w-full text-base shadow-md active:scale-95 transition-transform">
-            💬 ¿Antojo de algo dulce? Pide por WhatsApp
+           class="wa-btn" style="text-decoration:none; font-size:13px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:17px;height:17px;flex-shrink:0;">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.109.549 4.09 1.508 5.815L0 24l6.348-1.485A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.797 9.797 0 01-5.001-1.371l-.357-.213-3.769.882.915-3.667-.234-.376A9.768 9.768 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/>
+            </svg>
+            Consultar disponibilidad por WhatsApp
         </a>
+        <p style="text-align:center; font-size:10px; color:rgba(42,26,53,0.32); margin-top:7px; letter-spacing:0.02em;">Sin costo mínimo &nbsp;·&nbsp; Entrega local disponible &nbsp;·&nbsp; Hecho el mismo día</p>
     </div>
 
-    <!-- Active cart footer -->
     <div id="footer-active" style="display:none;">
-        <button onclick="openCart()"
-                class="flex items-center justify-between bg-bakeryChoco text-bakeryCream font-bold py-3.5 px-4 rounded-xl w-full shadow-md active:scale-95 transition-transform">
-            <div class="flex items-center gap-2">
-                <span class="bg-bakeryOrange text-white text-xs font-extrabold w-6 h-6 rounded-full flex items-center justify-center" id="footer-qty">0</span>
-                <span class="text-sm">Ver mi pedido</span>
+        <button onclick="openCart()" class="cart-trigger-btn">
+            <div style="display:flex; align-items:center; gap:10px;">
+                <span style="background:rgba(180,143,212,0.25); color:rgba(255,255,255,0.9); font-size:11px; font-weight:700; width:22px; height:22px; border-radius:50%; display:flex; align-items:center; justify-content:center;" id="footer-qty">0</span>
+                <span style="font-size:13px; font-weight:600;">Ver mi pedido</span>
             </div>
-            <div class="flex items-center gap-1.5">
-                <span id="footer-total" class="font-extrabold text-base font-serif">MX$0</span>
-                <span class="text-bakeryCream/60 text-xs">→</span>
+            <div style="display:flex; align-items:center; gap:6px;">
+                <span id="footer-total" class="font-serif" style="font-size:17px; font-weight:600;">MX$0</span>
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px;opacity:0.5;"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd" /></svg>
             </div>
         </button>
     </div>
 </footer>
 
 
-<!-- ═══════════════════════════════════════════
+<!-- ════════════════════════════════
      CART LOGIC
-════════════════════════════════════════════ -->
+════════════════════════════════ -->
 <script>
-    // ── State ──────────────────────────────────
-    const cart = {}; // { id: { name, price, qty } }
+    const cart = {};
 
-    // ── DOM refs ───────────────────────────────
     const drawerEl       = document.getElementById('cart-drawer');
     const overlayEl      = document.getElementById('cart-overlay');
     const badgeEl        = document.getElementById('header-badge');
@@ -487,153 +936,104 @@
     const footerQtyEl    = document.getElementById('footer-qty');
     const footerTotalEl  = document.getElementById('footer-total');
 
-
-    // ── Add to cart ────────────────────────────
     function addToCart(btn) {
         const card  = btn.closest('[data-id]');
         const id    = card.dataset.id;
         const name  = card.dataset.name;
         const price = parseInt(card.dataset.price, 10);
 
-        if (cart[id]) {
-            cart[id].qty++;
-        } else {
-            cart[id] = { name, price, qty: 1 };
-        }
+        cart[id] ? cart[id].qty++ : (cart[id] = { name, price, qty: 1 });
 
-        // Button feedback
-        btn.classList.add('btn-added');
-        btn.innerHTML = '<span class="btn-icon">✓</span> Agregado';
+        btn.classList.add('btn-confirmed');
+        btn.innerHTML = '<span>✓</span> Agregado';
         setTimeout(() => {
-            btn.classList.remove('btn-added');
-            btn.innerHTML = '<span class="btn-icon">＋</span> Agregar al carrito';
-        }, 1200);
+            btn.classList.remove('btn-confirmed');
+            btn.innerHTML = '<span class="btn-plus">+</span> Agregar';
+        }, 1300);
 
         refreshUI();
         popBadge();
     }
 
-
-    // ── Remove item entirely ───────────────────
     function removeItem(id) {
         delete cart[id];
         refreshUI();
         renderCartRows();
     }
 
-
-    // ── Change qty ─────────────────────────────
     function changeQty(id, delta) {
         if (!cart[id]) return;
         cart[id].qty += delta;
-        if (cart[id].qty <= 0) {
-            delete cart[id];
-        }
+        if (cart[id].qty <= 0) delete cart[id];
         refreshUI();
         renderCartRows();
     }
 
-
-    // ── Clear cart ─────────────────────────────
     function clearCart() {
         Object.keys(cart).forEach(k => delete cart[k]);
         refreshUI();
         renderCartRows();
     }
 
+    function getTotal()    { return Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0); }
+    function getTotalQty() { return Object.values(cart).reduce((s, i) => s + i.qty, 0); }
 
-    // ── Totals ─────────────────────────────────
-    function getTotal() {
-        return Object.values(cart).reduce((s, i) => s + i.price * i.qty, 0);
-    }
-    function getTotalQty() {
-        return Object.values(cart).reduce((s, i) => s + i.qty, 0);
-    }
-
-
-    // ── Refresh all UI surfaces ─────────────────
     function refreshUI() {
-        const qty   = getTotalQty();
-        const total = getTotal();
-        const hasItems = qty > 0;
+        const qty = getTotalQty(), total = getTotal(), has = qty > 0;
 
-        // Header badge
-        if (hasItems) {
-            badgeEl.style.display = 'flex';
-            badgeEl.textContent = qty;
-        } else {
-            badgeEl.style.display = 'none';
-        }
+        badgeEl.style.display = has ? 'flex' : 'none';
+        badgeEl.textContent   = qty;
 
-        // Footer
-        if (hasItems) {
-            footerEmptyEl.style.display = 'none';
-            footerActiveEl.style.display = 'block';
-            footerQtyEl.textContent  = qty;
-            footerTotalEl.textContent = `MX$${total}`;
-        } else {
-            footerEmptyEl.style.display = 'block';
-            footerActiveEl.style.display = 'none';
-        }
+        footerEmptyEl.style.display  = has ? 'none'  : 'block';
+        footerActiveEl.style.display = has ? 'block' : 'none';
+        footerQtyEl.textContent   = qty;
+        footerTotalEl.textContent = `MX$${total}`;
 
-        // Drawer totals
         cartTotalEl.textContent = `MX$${total}`;
-        const itemCount = Object.keys(cart).length;
-        cartCountLabel.textContent = itemCount === 0
-            ? '0 productos'
-            : `${itemCount} producto${itemCount > 1 ? 's' : ''} · ${qty} unidad${qty > 1 ? 'es' : ''}`;
+        const ic = Object.keys(cart).length;
+        cartCountLabel.textContent = ic === 0
+            ? 'Sin productos'
+            : `${ic} producto${ic > 1 ? 's' : ''} · ${qty} unidad${qty > 1 ? 'es' : ''}`;
 
-        // Drawer empty/list/footer visibility
-        if (hasItems) {
-            cartEmptyEl.style.display = 'none';
-            cartListEl.style.display  = 'block';
-            cartFooterEl.style.display = 'block';
-        } else {
-            cartEmptyEl.style.display = 'flex';
-            cartListEl.style.display  = 'none';
-            cartFooterEl.style.display = 'none';
-        }
+        cartEmptyEl.style.display  = has ? 'none'  : 'flex';
+        cartListEl.style.display   = has ? 'block' : 'none';
+        cartFooterEl.style.display = has ? 'block' : 'none';
     }
 
-
-    // ── Render cart rows ───────────────────────
     function renderCartRows() {
         cartListEl.innerHTML = '';
         Object.entries(cart).forEach(([id, item]) => {
             const row = document.createElement('div');
-            row.className = 'cart-row flex items-center gap-3 bg-white rounded-xl px-3 py-2.5 border border-bakeryChoco/5';
+            row.className = 'cart-row';
+            row.style.cssText = 'display:flex; align-items:center; gap:10px; background:white; border-radius:10px; padding:10px 12px; border:1px solid rgba(180,143,212,0.14); margin-bottom:8px;';
             row.innerHTML = `
-                <div class="flex-1 min-w-0">
-                    <p class="text-xs font-bold text-bakeryChoco truncate">${item.name}</p>
-                    <p class="text-[10px] text-bakeryChoco/50 mt-0.5">MX$${item.price} c/u</p>
+                <div style="flex:1; min-width:0;">
+                    <p style="font-size:13px; font-weight:600; color:#2A1A35; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.name}</p>
+                    <p style="font-size:11px; color:rgba(42,26,53,0.4); margin-top:1px;">MX$${item.price} c/u</p>
                 </div>
-                <div class="flex items-center gap-1 shrink-0">
-                    <button class="qty-btn bg-bakeryChoco/8 text-bakeryChoco hover:bg-bakeryChoco/15"
+                <div style="display:flex; align-items:center; gap:8px; flex-shrink:0;">
+                    <button class="qty-btn" style="background:rgba(180,143,212,0.15); color:#5C4470; border:none; cursor:pointer;"
                             onclick="changeQty('${id}', -1)">−</button>
-                    <span class="text-sm font-extrabold text-bakeryChoco w-6 text-center">${item.qty}</span>
-                    <button class="qty-btn bg-bakeryChoco text-bakeryCream hover:bg-bakeryChoco/80"
+                    <span style="font-size:14px; font-weight:700; color:#2A1A35; width:20px; text-align:center; display:inline-block;">${item.qty}</span>
+                    <button class="qty-btn" style="background:#2A1A35; color:white; border:none; cursor:pointer;"
                             onclick="changeQty('${id}', 1)">+</button>
                 </div>
-                <div class="text-right shrink-0 min-w-[52px]">
-                    <p class="text-xs font-extrabold text-bakeryChoco">MX$${item.price * item.qty}</p>
+                <div style="text-align:right; flex-shrink:0; min-width:52px;">
+                    <p style="font-family:'Cormorant Garamond',serif; font-size:16px; font-weight:600; color:#2A1A35;">MX$${item.price * item.qty}</p>
                     <button onclick="removeItem('${id}')"
-                            class="text-[10px] text-red-400 hover:text-red-600 font-bold mt-0.5">quitar</button>
+                            style="font-size:10px; font-weight:500; color:rgba(233,160,184,0.9); background:none; border:none; cursor:pointer; margin-top:2px;">quitar</button>
                 </div>`;
             cartListEl.appendChild(row);
         });
     }
 
-
-    // ── Badge pop animation ─────────────────────
     function popBadge() {
         badgeEl.classList.remove('badge-pop');
-        void badgeEl.offsetWidth; // reflow
+        void badgeEl.offsetWidth;
         badgeEl.classList.add('badge-pop');
         badgeEl.addEventListener('animationend', () => badgeEl.classList.remove('badge-pop'), { once: true });
     }
 
-
-    // ── Open / Close drawer ────────────────────
     function openCart() {
         renderCartRows();
         refreshUI();
@@ -647,26 +1047,16 @@
         document.body.style.overflow = '';
     }
 
-
-    // ── Build & send WhatsApp message ──────────
     function sendWhatsAppOrder() {
         const items = Object.values(cart);
         if (!items.length) return;
-
-        let lines = ['🧺 *Pedido - El hada de los pays*', ''];
-        items.forEach(item => {
-            lines.push(`• ${item.name}`);
-            lines.push(`  ${item.qty} × MX$${item.price} = MX$${item.price * item.qty}`);
+        let lines = ['*Pedido — El hada de los pays*', ''];
+        items.forEach(i => {
+            lines.push(`• ${i.name}  ×${i.qty}  MX$${i.price * i.qty}`);
         });
-        lines.push('');
-        lines.push(`*Total: MX$${getTotal()}*`);
-        lines.push('');
-        lines.push('¡Hola! Quisiera hacer este pedido. ¿Tienen disponibilidad?');
-
-        const text = encodeURIComponent(lines.join('\n'));
-        window.open(`https://wa.me/524613504042?text=${text}`, '_blank');
+        lines.push('', `*Total: MX$${getTotal()}*`, '', 'Hola, quisiera hacer este pedido. ¿Hay disponibilidad?');
+        window.open(`https://wa.me/524613504042?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
     }
 </script>
-
 </body>
 </html>
