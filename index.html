@@ -263,10 +263,61 @@
 
     <!-- Footer -->
     <div id="cart-footer" style="padding: 14px 20px 20px; border-top: 1px solid rgba(180,143,212,0.18); display:none;">
-        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;">
+
+        <!-- Total row -->
+        <div style="display:flex; justify-content:space-between; align-items:baseline; margin-bottom:16px;">
             <span style="font-size:12px; color:rgba(42,26,53,0.5); font-weight:500; text-transform:uppercase; letter-spacing:0.06em;">Total</span>
             <span id="cart-total" class="font-serif" style="font-size:24px; font-weight:600; color:#2A1A35;">MX$0</span>
         </div>
+
+        <!-- ── DATE PICKER ── -->
+        <div style="margin-bottom:14px;">
+            <p style="font-size:11px; font-weight:600; color:rgba(42,26,53,0.55); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:8px;">¿Para cuándo es tu pedido?</p>
+            <button id="date-picker-btn" onclick="toggleDatePicker()"
+                    style="width:100%; display:flex; align-items:center; justify-content:space-between; padding:11px 14px; border-radius:10px; border:1.5px solid rgba(180,143,212,0.4); background:white; cursor:pointer; transition:border-color 0.15s;">
+                <div style="display:flex; align-items:center; gap:9px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#9B6DC5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;flex-shrink:0;">
+                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                    </svg>
+                    <span id="date-display" style="font-size:13px; font-weight:500; color:#2A1A35;">Seleccionar fecha</span>
+                </div>
+                <svg id="date-chevron" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="none" stroke="rgba(42,26,53,0.35)" stroke-width="2" style="width:14px;height:14px;transition:transform 0.2s;"><polyline points="5 8 10 13 15 8"></polyline></svg>
+            </button>
+
+            <!-- Calendar panel -->
+            <div id="calendar-panel" style="display:none; margin-top:8px; border:1px solid rgba(180,143,212,0.2); border-radius:12px; background:white; padding:14px; box-shadow:0 4px 16px rgba(42,26,53,0.08);">
+
+                <!-- Month nav -->
+                <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:12px;">
+                    <button onclick="shiftMonth(-1)"
+                            style="width:28px;height:28px;border:none;background:rgba(180,143,212,0.12);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#5C4470;">‹</button>
+                    <span id="cal-month-label" style="font-size:13px; font-weight:600; color:#2A1A35; letter-spacing:0.01em;"></span>
+                    <button onclick="shiftMonth(1)"
+                            style="width:28px;height:28px;border:none;background:rgba(180,143,212,0.12);border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;color:#5C4470;">›</button>
+                </div>
+
+                <!-- Day-of-week headers -->
+                <div style="display:grid; grid-template-columns:repeat(7,1fr); text-align:center; margin-bottom:6px;">
+                    <span style="font-size:10px;font-weight:700;color:rgba(42,26,53,0.35);padding:2px 0;">Do</span>
+                    <span style="font-size:10px;font-weight:700;color:rgba(42,26,53,0.35);padding:2px 0;">Lu</span>
+                    <span style="font-size:10px;font-weight:700;color:rgba(42,26,53,0.35);padding:2px 0;">Ma</span>
+                    <span style="font-size:10px;font-weight:700;color:rgba(42,26,53,0.35);padding:2px 0;">Mi</span>
+                    <span style="font-size:10px;font-weight:700;color:rgba(42,26,53,0.35);padding:2px 0;">Ju</span>
+                    <span style="font-size:10px;font-weight:700;color:rgba(42,26,53,0.35);padding:2px 0;">Vi</span>
+                    <span style="font-size:10px;font-weight:700;color:rgba(42,26,53,0.35);padding:2px 0;">Sá</span>
+                </div>
+
+                <!-- Day cells -->
+                <div id="cal-grid" style="display:grid; grid-template-columns:repeat(7,1fr); gap:3px; text-align:center;"></div>
+
+                <p style="font-size:10px; color:rgba(42,26,53,0.3); margin-top:10px; text-align:center;">Solo días con servicio disponible</p>
+            </div>
+        </div>
+
+        <!-- Action buttons -->
         <div style="display:flex; gap:8px;">
             <button onclick="clearCart()"
                     style="padding: 12px 16px; border-radius:10px; border: 1px solid rgba(180,143,212,0.35); background:transparent; color:rgba(42,26,53,0.5); font-size:12px; font-weight:600; cursor:pointer; white-space:nowrap;">
@@ -1040,6 +1091,7 @@
         drawerEl.classList.remove('hidden-drawer');
         overlayEl.classList.remove('hidden-overlay');
         document.body.style.overflow = 'hidden';
+        initCalendar();
     }
     function closeCart() {
         drawerEl.classList.add('hidden-drawer');
@@ -1050,13 +1102,149 @@
     function sendWhatsAppOrder() {
         const items = Object.values(cart);
         if (!items.length) return;
+
+        const dateVal = document.getElementById('date-display').dataset.isoDate;
+        const dateLabel = document.getElementById('date-display').textContent;
+
         let lines = ['*Pedido — El hada de los pays*', ''];
         items.forEach(i => {
             lines.push(`• ${i.name}  ×${i.qty}  MX$${i.price * i.qty}`);
         });
-        lines.push('', `*Total: MX$${getTotal()}*`, '', 'Hola, quisiera hacer este pedido. ¿Hay disponibilidad?');
+        lines.push('', `*Total: MX$${getTotal()}*`, '');
+
+        if (dateVal) {
+            lines.push(`📅 Quisiera este pedido para el *${dateLabel}*`, '');
+        }
+
+        lines.push('Hola, quisiera hacer este pedido. ¿Hay disponibilidad?');
         window.open(`https://wa.me/524613504042?text=${encodeURIComponent(lines.join('\n'))}`, '_blank');
     }
+
+    // ════════════════════════════════
+    //  CALENDAR
+    // ════════════════════════════════
+
+    // Business days: 0=Sun(closed), 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+    const OPEN_DAYS = new Set([1, 2, 3, 4, 5, 6]); // Sun closed
+
+    const MONTHS_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+    const DAYS_ES   = ['domingo','lunes','martes','miércoles','jueves','viernes','sábado'];
+
+    let calYear, calMonth;
+
+    function initCalendar() {
+        const today = new Date();
+        calYear  = today.getFullYear();
+        calMonth = today.getMonth();
+        renderCalendar();
+    }
+
+    function shiftMonth(delta) {
+        calMonth += delta;
+        if (calMonth > 11) { calMonth = 0;  calYear++; }
+        if (calMonth < 0)  { calMonth = 11; calYear--; }
+        renderCalendar();
+    }
+
+    function renderCalendar() {
+        document.getElementById('cal-month-label').textContent =
+            `${MONTHS_ES[calMonth]} ${calYear}`;
+
+        const grid    = document.getElementById('cal-grid');
+        const today   = new Date();
+        today.setHours(0,0,0,0);
+
+        const firstDay = new Date(calYear, calMonth, 1).getDay(); // 0=Sun
+        const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+
+        const selectedIso = document.getElementById('date-display').dataset.isoDate || '';
+
+        grid.innerHTML = '';
+
+        // Empty cells before first day
+        for (let i = 0; i < firstDay; i++) {
+            const blank = document.createElement('div');
+            grid.appendChild(blank);
+        }
+
+        for (let d = 1; d <= daysInMonth; d++) {
+            const date    = new Date(calYear, calMonth, d);
+            const dayOfW  = date.getDay();
+            const isPast  = date < today;
+            const isOpen  = OPEN_DAYS.has(dayOfW) && !isPast;
+            const isoStr  = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            const isSel   = isoStr === selectedIso;
+
+            const cell = document.createElement('button');
+            cell.textContent = d;
+            cell.disabled = !isOpen;
+
+            let cellStyle = `
+                width:100%; aspect-ratio:1; border:none; border-radius:8px;
+                font-size:12px; font-weight:500; cursor:${isOpen ? 'pointer' : 'default'};
+                transition: background 0.15s, color 0.15s;
+            `;
+
+            if (isSel) {
+                cellStyle += 'background:#9B6DC5; color:white; font-weight:700;';
+            } else if (isPast || !isOpen) {
+                cellStyle += 'background:transparent; color:rgba(42,26,53,0.2);';
+            } else {
+                cellStyle += 'background:transparent; color:#2A1A35;';
+                cell.onmouseover = () => { cell.style.background = 'rgba(180,143,212,0.18)'; };
+                cell.onmouseout  = () => { if (cell.dataset.iso !== selectedIso) cell.style.background = 'transparent'; };
+            }
+
+            cell.style.cssText = cellStyle;
+            cell.dataset.iso = isoStr;
+
+            if (isOpen) {
+                cell.onclick = () => selectDate(date, isoStr);
+            }
+
+            grid.appendChild(cell);
+        }
+    }
+
+    function selectDate(dateObj, isoStr) {
+        const dayName   = DAYS_ES[dateObj.getDay()];
+        const day       = dateObj.getDate();
+        const month     = MONTHS_ES[dateObj.getMonth()];
+        const year      = dateObj.getFullYear();
+        const label     = `${dayName} ${day} de ${month} de ${year}`;
+
+        const display = document.getElementById('date-display');
+        display.textContent     = label;
+        display.dataset.isoDate = isoStr;
+        display.style.color     = '#9B6DC5';
+        display.style.fontWeight = '600';
+
+        // Update button border to show selection
+        document.getElementById('date-picker-btn').style.borderColor = '#9B6DC5';
+
+        // Re-render to show selected highlight
+        renderCalendar();
+
+        // Close panel after brief delay
+        setTimeout(() => toggleDatePicker(false), 200);
+    }
+
+    function toggleDatePicker(forceClose) {
+        const panel   = document.getElementById('calendar-panel');
+        const chevron = document.getElementById('date-chevron');
+        const isOpen  = panel.style.display !== 'none';
+
+        if (forceClose === false || isOpen) {
+            panel.style.display = 'none';
+            chevron.style.transform = 'rotate(0deg)';
+        } else {
+            panel.style.display = 'block';
+            chevron.style.transform = 'rotate(180deg)';
+            renderCalendar();
+        }
+    }
+
+    // Init calendar when cart opens — handled inside openCart() above
 </script>
 </body>
 </html>
