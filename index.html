@@ -203,6 +203,77 @@
         }
         .wa-btn:active { opacity: 0.9; transform: scale(0.98); }
 
+        /* ── Out of stock ── */
+        .product-card.agotado {
+            opacity: 0.55;
+        }
+        .product-card.agotado .add-btn {
+            pointer-events: none;
+            border-color: rgba(42,26,53,0.15);
+            color: rgba(42,26,53,0.3);
+        }
+        .agotado-tag {
+            display: inline-block;
+            font-size: 9px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #b03a3a;
+            background: rgba(176,58,58,0.1);
+            border: 1px solid rgba(176,58,58,0.2);
+            border-radius: 4px;
+            padding: 2px 6px;
+            margin-top: 5px;
+        }
+
+        /* ── Admin panel ── */
+        #admin-panel {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            background: #FAF7FB;
+            display: none;
+            flex-direction: column;
+        }
+        #admin-panel.active { display: flex; }
+        .admin-toggle {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid rgba(180,143,212,0.15);
+            font-size: 13px;
+            font-weight: 500;
+            color: #2A1A35;
+        }
+        /* iOS-style toggle switch */
+        .switch {
+            position: relative;
+            width: 44px; height: 26px;
+            flex-shrink: 0;
+        }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .switch-track {
+            position: absolute;
+            inset: 0;
+            border-radius: 13px;
+            background: rgba(42,26,53,0.15);
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+        .switch-track::after {
+            content: '';
+            position: absolute;
+            width: 20px; height: 20px;
+            border-radius: 50%;
+            background: white;
+            top: 3px; left: 3px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+            transition: transform 0.2s;
+        }
+        .switch input:checked + .switch-track { background: #9B6DC5; }
+        .switch input:checked + .switch-track::after { transform: translateX(18px); }
+
         /* ── Cart footer trigger ── */
         .cart-trigger-btn {
             display: flex;
@@ -223,7 +294,51 @@
 </head>
 <body>
 
-<!-- ── OVERLAY ── -->
+<!-- ════════════════════════════════
+     ADMIN PANEL
+════════════════════════════════ -->
+<div id="admin-panel">
+    <!-- Header -->
+    <div style="background:#2A1A35; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+        <div>
+            <p style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:rgba(180,143,212,0.7); margin-bottom:2px;">Panel de administración</p>
+            <h2 style="font-size:18px; font-weight:600; color:white; font-family:'Cormorant Garamond',serif;">Control de inventario</h2>
+        </div>
+        <button onclick="closeAdmin()"
+                style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;cursor:pointer;color:white;font-size:16px;display:flex;align-items:center;justify-content:center;">✕</button>
+    </div>
+
+    <!-- Login gate -->
+    <div id="admin-login" style="flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:32px 24px; gap:12px;">
+        <div style="width:52px;height:52px;border-radius:50%;background:rgba(155,109,197,0.12);display:flex;align-items:center;justify-content:center;margin-bottom:4px;">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#9B6DC5" stroke-width="2" style="width:24px;height:24px;"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <p style="font-size:16px;font-weight:600;color:#2A1A35;font-family:'Cormorant Garamond',serif;">Acceso restringido</p>
+        <input id="admin-password-input" type="password" placeholder="Contraseña"
+               style="width:100%;max-width:280px;padding:12px 14px;border-radius:10px;border:1.5px solid rgba(180,143,212,0.4);background:white;font-size:14px;color:#2A1A35;outline:none;"
+               onkeydown="if(event.key==='Enter') verifyAdmin()">
+        <p id="admin-error" style="font-size:12px;color:#b03a3a;display:none;">Contraseña incorrecta</p>
+        <button onclick="verifyAdmin()"
+                style="width:100%;max-width:280px;padding:13px;border-radius:10px;background:#2A1A35;color:white;font-size:13px;font-weight:600;border:none;cursor:pointer;">
+            Entrar
+        </button>
+    </div>
+
+    <!-- Stock controls (shown after login) -->
+    <div id="admin-controls" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
+        <!-- Save banner -->
+        <div id="admin-saved-banner"
+             style="display:none; background:rgba(95,168,82,0.12); border-bottom:1px solid rgba(95,168,82,0.25); padding:10px 20px; text-align:center; font-size:12px; font-weight:600; color:#3d7a32;">
+            ✓ Cambios guardados
+        </div>
+
+        <div style="padding:12px 20px 6px; border-bottom:1px solid rgba(180,143,212,0.15); flex-shrink:0;">
+            <p style="font-size:11px; color:rgba(42,26,53,0.4); font-weight:500;">Activa o desactiva la disponibilidad de cada producto. Los cambios se guardan al instante.</p>
+        </div>
+
+        <div id="admin-product-list" style="flex:1; overflow-y:auto; padding:0 20px 40px;"></div>
+    </div>
+</div>
 <div id="cart-overlay"
      class="fixed inset-0 z-40 hidden-overlay"
      style="background:rgba(42,26,53,0.5); backdrop-filter: blur(4px);"
@@ -1245,6 +1360,216 @@
     }
 
     // Init calendar when cart opens — handled inside openCart() above
+
+    // ════════════════════════════════
+    //  STOCK SYSTEM
+    // ════════════════════════════════
+
+    // All product IDs and names (must match data-id on cards)
+    const ALL_PRODUCTS = [
+        { id: 'pay-strudel-manzana',     name: 'Strudel de manzana' },
+        { id: 'pay-queso',               name: 'Pay de queso' },
+        { id: 'pay-queso-fruta-choco',   name: 'Pay de queso con fruta y/o chocolate' },
+        { id: 'pay-guayaba',             name: 'Pay de guayaba' },
+        { id: 'pay-pina',                name: 'Pay de piña' },
+        { id: 'pay-jamon-queso',         name: 'Pay de jamón con queso' },
+        { id: 'pay-atun',                name: 'Pay de atún' },
+        { id: 'pay-espinacas-queso',     name: 'Pay de espinacas con queso' },
+        { id: 'pay-champinones-queso',   name: 'Pay de champiñones con queso' },
+        { id: 'panque-elote',            name: 'Panqué de elote' },
+        { id: 'panque-platano',          name: 'Panqué de plátano' },
+        { id: 'panque-zanahoria',        name: 'Panqué de zanahoria' },
+        { id: 'panque-naranja',          name: 'Panqué de naranja' },
+        { id: 'panque-nuez',             name: 'Panqué de nuez' },
+        { id: 'panque-marmoleado',       name: 'Panqué marmoleado' },
+        { id: 'galletas-mantequilla',    name: 'Galletas de mantequilla' },
+        { id: 'galletas-encaneladas',    name: 'Galletas encaneladas' },
+        { id: 'besos-nuez',              name: 'Besos de nuez' },
+        { id: 'galletas-avena',          name: 'Galletas de avena' },
+        { id: 'brownies',                name: 'Brownies' },
+        { id: 'roles-canela',            name: 'Roles de canela' },
+        { id: 'roles-canela-topping',    name: 'Roles de canela con topping' },
+        { id: 'bunuelos-aire',           name: 'Buñuelos de aire' },
+        { id: 'tartaleta-frutas-individual', name: 'Tartaleta con frutas (individual)' },
+        { id: 'alfajores',               name: 'Alfajores' },
+        { id: 'cheesecake-tortuga',      name: 'Cheesecake tortuga' },
+        { id: 'tartaleta-frutas-entera', name: 'Tartaleta con frutas (entera)' },
+        { id: 'pastel-tres-leches',      name: 'Pastel de tres leches' },
+        { id: 'pastel-red-velvet',       name: 'Pastel de red velvet' },
+        { id: 'imposible-elote',         name: 'Imposible de elote' },
+    ];
+
+    // Holds current stock state: { productId: true/false }
+    // true = in stock, false = agotado
+    // Default assumption: everything is in stock until KV says otherwise
+    let stockState = {};
+
+    // ── Load stock from API on page load ─────────────────────────────────
+    async function loadStock() {
+        try {
+            const res  = await fetch('/api/stock');
+            const data = await res.json();
+            if (data.ok) {
+                stockState = data.stock;
+                applyStockToMenu();
+            }
+        } catch (e) {
+            // Silently fail — everything stays in stock if API unreachable
+            console.warn('Stock API unavailable, assuming all in stock');
+        }
+    }
+
+    // ── Apply stock state to all product cards ────────────────────────────
+    function applyStockToMenu() {
+        ALL_PRODUCTS.forEach(({ id }) => {
+            const card = document.querySelector(`[data-id="${id}"]`);
+            if (!card) return;
+
+            // KV returns true if explicitly set to in-stock
+            // If not set yet, default to in stock (true)
+            const inStock = stockState[id] !== false;
+
+            const btn = card.querySelector('.add-btn');
+            let tag   = card.querySelector('.agotado-tag');
+
+            if (!inStock) {
+                card.classList.add('agotado');
+                if (btn) {
+                    btn.innerHTML = '<span>✕</span> Agotado';
+                    btn.disabled = true;
+                }
+                if (!tag) {
+                    tag = document.createElement('span');
+                    tag.className = 'agotado-tag';
+                    tag.textContent = 'Agotado';
+                    btn && btn.parentNode ? btn.parentNode.insertBefore(tag, btn) : card.appendChild(tag);
+                }
+            } else {
+                card.classList.remove('agotado');
+                if (btn && btn.disabled) {
+                    btn.innerHTML = '<span class="btn-plus">+</span> Agregar';
+                    btn.disabled = false;
+                }
+                if (tag) tag.remove();
+            }
+        });
+    }
+
+    // ── Run on page load ──────────────────────────────────────────────────
+    loadStock();
+
+    // ── Check for admin URL param ─────────────────────────────────────────
+    if (new URLSearchParams(window.location.search).get('admin') === 'true') {
+        document.getElementById('admin-panel').classList.add('active');
+    }
+
+    // ── Admin auth ────────────────────────────────────────────────────────
+    let adminToken = null;
+
+    async function verifyAdmin() {
+        const input = document.getElementById('admin-password-input');
+        const pw    = input.value.trim();
+        const err   = document.getElementById('admin-error');
+        if (!pw) return;
+
+        // Test the password against the API (POST with wrong body will 401)
+        try {
+            const res = await fetch('/api/stock', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${pw}` },
+                body: JSON.stringify({ id: '__test__', inStock: true }),
+            });
+            if (res.status === 401) {
+                err.style.display = 'block';
+                input.style.borderColor = '#b03a3a';
+                return;
+            }
+            // Success — store token, show controls
+            adminToken = pw;
+            err.style.display = 'none';
+            document.getElementById('admin-login').style.display    = 'none';
+            document.getElementById('admin-controls').style.display = 'flex';
+            renderAdminList();
+        } catch (e) {
+            err.textContent = 'Error de conexión';
+            err.style.display = 'block';
+        }
+    }
+
+    // ── Render admin product list ─────────────────────────────────────────
+    function renderAdminList() {
+        const list = document.getElementById('admin-product-list');
+        list.innerHTML = '';
+
+        // Group by category
+        const categories = [
+            { label: 'Pays dulces',    ids: ['pay-strudel-manzana','pay-queso','pay-queso-fruta-choco','pay-guayaba','pay-pina'] },
+            { label: 'Pays salados',   ids: ['pay-jamon-queso','pay-atun','pay-espinacas-queso','pay-champinones-queso'] },
+            { label: 'Panqué',         ids: ['panque-elote','panque-platano','panque-zanahoria','panque-naranja','panque-nuez','panque-marmoleado'] },
+            { label: 'Galletas',       ids: ['galletas-mantequilla','galletas-encaneladas','besos-nuez','galletas-avena'] },
+            { label: 'Otras delicias', ids: ['brownies','roles-canela','roles-canela-topping','bunuelos-aire','tartaleta-frutas-individual','alfajores'] },
+            { label: 'Pasteles',       ids: ['cheesecake-tortuga','tartaleta-frutas-entera','pastel-tres-leches','pastel-red-velvet','imposible-elote'] },
+        ];
+
+        categories.forEach(cat => {
+            // Category label
+            const catLabel = document.createElement('p');
+            catLabel.style.cssText = 'font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(42,26,53,0.4);padding:16px 0 4px;';
+            catLabel.textContent = cat.label;
+            list.appendChild(catLabel);
+
+            cat.ids.forEach(id => {
+                const product = ALL_PRODUCTS.find(p => p.id === id);
+                if (!product) return;
+
+                const inStock = stockState[id] !== false;
+
+                const row = document.createElement('div');
+                row.className = 'admin-toggle';
+                row.innerHTML = `
+                    <span style="flex:1;padding-right:12px;">${product.name}</span>
+                    <label class="switch">
+                        <input type="checkbox" ${inStock ? 'checked' : ''} onchange="toggleStock('${id}', this.checked)">
+                        <span class="switch-track"></span>
+                    </label>`;
+                list.appendChild(row);
+            });
+        });
+    }
+
+    // ── Toggle a product's stock status ───────────────────────────────────
+    async function toggleStock(id, inStock) {
+        // Optimistic update
+        stockState[id] = inStock;
+        applyStockToMenu();
+
+        try {
+            await fetch('/api/stock', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                body: JSON.stringify({ id, inStock }),
+            });
+            // Show saved flash
+            const banner = document.getElementById('admin-saved-banner');
+            banner.style.display = 'block';
+            clearTimeout(banner._t);
+            banner._t = setTimeout(() => { banner.style.display = 'none'; }, 2000);
+        } catch (e) {
+            // Revert on failure
+            stockState[id] = !inStock;
+            applyStockToMenu();
+            renderAdminList();
+        }
+    }
+
+    // ── Close admin panel ─────────────────────────────────────────────────
+    function closeAdmin() {
+        document.getElementById('admin-panel').classList.remove('active');
+        // Remove ?admin=true from URL without reload
+        const url = new URL(window.location);
+        url.searchParams.delete('admin');
+        window.history.replaceState({}, '', url);
+    }
 </script>
 </body>
 </html>
