@@ -418,6 +418,21 @@
         </div>
     </div>
 </div>
+<!-- ════════════════════════════════
+     LIGHTBOX
+════════════════════════════════ -->
+<div id="lightbox"
+     onclick="closeLightbox()"
+     style="display:none; position:fixed; inset:0; z-index:200; background:rgba(42,26,53,0.75); backdrop-filter:blur(8px); align-items:center; justify-content:center; padding:32px 24px;">
+    <div style="position:relative; max-width:380px; width:100%;" onclick="event.stopPropagation()">
+        <button onclick="closeLightbox()"
+                style="position:absolute; top:-14px; right:-14px; width:32px; height:32px; border-radius:50%; background:white; border:none; cursor:pointer; display:flex; align-items:center; justify-content:center; font-size:14px; color:#2A1A35; box-shadow:0 2px 8px rgba(0,0,0,0.2); z-index:1;">✕</button>
+        <img id="lightbox-img" src="" alt=""
+             style="width:100%; border-radius:16px; display:block; box-shadow:0 8px 40px rgba(0,0,0,0.3); max-height:70vh; object-fit:contain;">
+        <p id="lightbox-label" style="text-align:center; color:white; font-size:13px; font-weight:500; margin-top:12px; opacity:0.8;"></p>
+    </div>
+</div>
+
 <div id="cart-overlay"
      class="fixed inset-0 z-40 hidden-overlay"
      style="background:rgba(42,26,53,0.5); backdrop-filter: blur(4px);"
@@ -1586,28 +1601,46 @@
     loadImages();
 
     // ── Load product images from KV ───────────────────────────────────────
-    // On page load, we fetch all saved image URLs and apply them to
-    // the product cards. This replaces the lavender placeholder with
-    // the real photo the owner uploaded.
     async function loadImages() {
         try {
             const res  = await fetch('/api/images');
             const data = await res.json();
             if (!data.ok) return;
 
-            // data.images = { 'pay-queso': 'https://...', ... }
             Object.entries(data.images).forEach(([id, url]) => {
                 const card = document.querySelector(`[data-id="${id}"]`);
                 if (!card) return;
                 const placeholder = card.querySelector('.img-placeholder');
                 if (!placeholder) return;
 
-                // Replace placeholder with actual image
-                placeholder.innerHTML = `<img src="${url}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;" onerror="this.style.display='none'">`;
+                // Get product name for lightbox label
+                const name = card.dataset.name || '';
+
+                // Replace placeholder with actual image + make it clickable
+                placeholder.innerHTML = `
+                    <img src="${url}" alt="${name}"
+                         style="width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;"
+                         onclick="openLightbox('${url}', '${name.replace(/'/g, "\\'")}')">`;
             });
         } catch (e) {
             // Silently fail — placeholders stay if images can't load
         }
+    }
+
+    // ── Lightbox ──────────────────────────────────────────────────────────
+    // A lightbox is just a full-screen overlay that shows an enlarged image.
+    // Clicking outside or the X closes it.
+    function openLightbox(url, name) {
+        const lb = document.getElementById('lightbox');
+        document.getElementById('lightbox-img').src   = url;
+        document.getElementById('lightbox-label').textContent = name;
+        lb.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
+
+    function closeLightbox() {
+        document.getElementById('lightbox').style.display = 'none';
+        document.body.style.overflow = '';
     }
     if (new URLSearchParams(window.location.search).get('admin') === 'true') {
         document.getElementById('admin-panel').classList.add('active');
@@ -1989,13 +2022,15 @@
             thumb.innerHTML = `<img src="${data.url}" style="width:100%;height:100%;object-fit:cover;">`;
 
             // ── Update the product card on the menu ───────────────────────
-            // This is called "optimistic update" — we update the UI immediately
-            // without waiting for a page reload
             const card = document.querySelector(`[data-id="${id}"]`);
             if (card) {
                 const placeholder = card.querySelector('.img-placeholder');
+                const name = card.dataset.name || '';
                 if (placeholder) {
-                    placeholder.innerHTML = `<img src="${data.url}" alt="" style="width:100%;height:100%;object-fit:cover;display:block;">`;
+                    placeholder.innerHTML = `
+                        <img src="${data.url}" alt="${name}"
+                             style="width:100%;height:100%;object-fit:cover;display:block;cursor:pointer;"
+                             onclick="openLightbox('${data.url}', '${name.replace(/'/g, "\\'")}')">`;
                 }
             }
 
