@@ -303,6 +303,7 @@
         <div>
             <p style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:rgba(180,143,212,0.7); margin-bottom:2px;">Panel de administración</p>
             <h2 style="font-size:18px; font-weight:600; color:white; font-family:'Cormorant Garamond',serif;">El hada de los pays</h2>
+            <p class="admin-subtitle" style="font-size:10px; color:rgba(255,255,255,0.35); margin-top:2px;"></p>
         </div>
         <button onclick="closeAdmin()"
                 style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;cursor:pointer;color:white;font-size:16px;display:flex;align-items:center;justify-content:center;">✕</button>
@@ -1709,7 +1710,10 @@
     }
 
     // ── Admin auth ────────────────────────────────────────────────────────
+    // adminToken  = the password (sent as Bearer token on every API call)
+    // adminRole   = 'admin' or 'employee' — controls which tabs are visible
     let adminToken = null;
+    let adminRole  = null;
 
     async function verifyAdmin() {
         const input = document.getElementById('admin-password-input');
@@ -1718,26 +1722,58 @@
         if (!pw) return;
 
         try {
-            const res = await fetch('/api/stock', {
+            // Use the dedicated auth endpoint — returns role cleanly
+            const res = await fetch('/api/auth', {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${pw}` },
-                body: JSON.stringify({ action: 'reset_all' }),
             });
+
             if (res.status === 401) {
                 err.style.display = 'block';
                 input.style.borderColor = '#b03a3a';
                 return;
             }
+
+            const data = await res.json();
             adminToken = pw;
+            adminRole  = data.role; // 'admin' or 'employee'
+
             err.style.display = 'none';
             document.getElementById('admin-login').style.display    = 'none';
             document.getElementById('admin-controls').style.display = 'flex';
-            renderAdminList();
+
+            // Show/hide tabs based on role
+            applyRoleToTabs();
+
+            // Load data for visible tabs
             loadOrders();
-            loadAnalytics();
+            if (adminRole === 'admin') {
+                renderAdminList();
+                loadAnalytics();
+            }
+
         } catch (e) {
             err.textContent = 'Error de conexión';
             err.style.display = 'block';
+        }
+    }
+
+    // ── Apply role to tab visibility ──────────────────────────────────────
+    // Employees only see Pedidos and Venta
+    // Admins see everything
+    function applyRoleToTabs() {
+        const analyticsBtn = document.getElementById('tab-analytics-btn');
+        const stockBtn     = document.getElementById('tab-stock-btn');
+        const subtitle     = document.querySelector('.admin-subtitle');
+
+        if (adminRole === 'employee') {
+            if (analyticsBtn) analyticsBtn.style.display = 'none';
+            if (stockBtn)     stockBtn.style.display     = 'none';
+            if (subtitle)     subtitle.textContent        = 'Sesión de empleada';
+        } else {
+            if (analyticsBtn) analyticsBtn.style.display = '';
+            if (stockBtn)     stockBtn.style.display     = '';
+            if (subtitle)     subtitle.textContent        = 'Sesión de administradora';
         }
     }
 
@@ -2330,7 +2366,12 @@
     document.head.appendChild(spinStyle);
     function closeAdmin() {
         document.getElementById('admin-panel').classList.remove('active');
-        // Remove ?admin=true from URL without reload
+        // Reset login state so next open starts fresh
+        adminToken = null;
+        adminRole  = null;
+        document.getElementById('admin-login').style.display    = 'flex';
+        document.getElementById('admin-controls').style.display = 'none';
+        document.getElementById('admin-password-input').value   = '';
         const url = new URL(window.location);
         url.searchParams.delete('admin');
         window.history.replaceState({}, '', url);
