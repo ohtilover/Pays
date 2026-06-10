@@ -14,9 +14,10 @@
 // If you only stored totals, those questions are impossible to answer.
 // Square, Toast, Shopify — they all do this.
 
-const KV_URL       = process.env.KV_REST_API_URL;
-const KV_TOKEN     = process.env.KV_REST_API_TOKEN;
-const ADMIN_SECRET = process.env.admin_secret;
+const KV_URL          = process.env.KV_REST_API_URL;
+const KV_TOKEN        = process.env.KV_REST_API_TOKEN;
+const ADMIN_SECRET    = process.env.admin_secret;
+const EMPLOYEE_SECRET = process.env.EMPLOYEE_SECRET;
 
 async function kv(command, ...args) {
     const res = await fetch(KV_URL, {
@@ -30,7 +31,8 @@ async function kv(command, ...args) {
 }
 
 function auth(req) {
-    return (req.headers['authorization'] || '').replace('Bearer ', '').trim() === ADMIN_SECRET;
+    const token = (req.headers['authorization'] || '').replace('Bearer ', '').trim();
+    return token === ADMIN_SECRET || token === EMPLOYEE_SECRET;
 }
 
 export default async function handler(req, res) {
