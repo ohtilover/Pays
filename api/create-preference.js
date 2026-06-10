@@ -78,7 +78,7 @@ export default async function handler(req, res) {
 
         return res.status(200).json({
             ok:          true,
-            checkoutUrl: data.sandbox_init_point, // test URL (use init_point for production)
+            checkoutUrl: data.init_point,
             preferenceId: data.id,
         });
 
