@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pago confirmado | El hada de los pays</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #FAF7FB;
+            color: #2A1A35;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            text-align: center;
+        }
+        .font-serif { font-family: 'Cormorant Garamond', serif; }
+
+        .circle {
+            width: 72px; height: 72px;
+            border-radius: 50%;
+            background: rgba(95,168,82,0.12);
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .circle svg { width: 36px; height: 36px; }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 28px;
+            font-weight: 600;
+            color: #2A1A35;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 14px;
+            color: rgba(42,26,53,0.6);
+            line-height: 1.6;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .details {
+            margin: 24px auto;
+            background: white;
+            border-radius: 14px;
+            padding: 16px 20px;
+            border: 1px solid rgba(180,143,212,0.2);
+            max-width: 320px;
+            width: 100%;
+            text-align: left;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(42,26,53,0.06);
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-label { color: rgba(42,26,53,0.45); }
+        .detail-value { font-weight: 600; color: #2A1A35; }
+
+        .wa-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #25D366;
+            color: white;
+            font-weight: 700;
+            font-size: 14px;
+            border-radius: 12px;
+            padding: 14px 24px;
+            text-decoration: none;
+            margin: 8px auto 0;
+            max-width: 320px;
+            width: 100%;
+            box-shadow: 0 2px 12px rgba(37,211,102,0.25);
+        }
+        .back-btn {
+            display: block;
+            margin: 12px auto 0;
+            font-size: 13px;
+            color: rgba(42,26,53,0.45);
+            text-decoration: none;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="circle">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#5fa852" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+    </div>
+
+    <h1>¡Pago confirmado!</h1>
+    <p>Tu pedido ha sido recibido. Te contactaremos pronto para coordinar la entrega.</p>
+
+    <div class="details" id="order-details" style="display:none;">
+        <div class="detail-row" id="row-total" style="display:none;">
+            <span class="detail-label">Total pagado</span>
+            <span class="detail-value" id="val-total"></span>
+        </div>
+        <div class="detail-row" id="row-date" style="display:none;">
+            <span class="detail-label">Fecha del pedido</span>
+            <span class="detail-value" id="val-date"></span>
+        </div>
+        <div class="detail-row" id="row-ref" style="display:none;">
+            <span class="detail-label">Referencia</span>
+            <span class="detail-value" id="val-ref"></span>
+        </div>
+    </div>
+
+    <a id="wa-confirm" href="#" class="wa-btn" style="display:none;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;flex-shrink:0;">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.109.549 4.09 1.508 5.815L0 24l6.348-1.485A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.797 9.797 0 01-5.001-1.371l-.357-.213-3.769.882.915-3.667-.234-.376A9.768 9.768 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/>
+        </svg>
+        Confirmar por WhatsApp
+    </a>
+
+    <a href="/" class="back-btn">← Volver al menú</a>
+
+<script>
+    // Parse URL params from MercadoPago redirect
+    const params = new URLSearchParams(window.location.search);
+    const paymentId     = params.get('payment_id');
+    const status        = params.get('status');
+    const externalRef   = params.get('external_reference');
+    const merchantOrder = params.get('merchant_order_id');
+
+    // Get order info stored before redirect
+    const savedOrder = JSON.parse(sessionStorage.getItem('pendingOrder') || '{}');
+
+    if (paymentId || savedOrder.total) {
+        const details = document.getElementById('order-details');
+        details.style.display = 'block';
+
+        if (savedOrder.total) {
+            document.getElementById('row-total').style.display = 'flex';
+            document.getElementById('val-total').textContent = `MX$${savedOrder.total}`;
+        }
+        if (savedOrder.date) {
+            document.getElementById('row-date').style.display = 'flex';
+            document.getElementById('val-date').textContent = savedOrder.date;
+        }
+        if (paymentId) {
+            document.getElementById('row-ref').style.display = 'flex';
+            document.getElementById('val-ref').textContent = `#${paymentId}`;
+        }
+
+        // Build WhatsApp confirmation message
+        const waBtn = document.getElementById('wa-confirm');
+        waBtn.style.display = 'flex';
+
+        let msg = `✅ *Pago confirmado — El hada de los pays*\n\n`;
+        if (savedOrder.items) {
+            savedOrder.items.forEach(i => {
+                msg += `• ${i.name}  ×${i.qty}  MX$${i.price * i.qty}\n`;
+            });
+        }
+        if (savedOrder.total) msg += `\n*Total pagado: MX$${savedOrder.total}*\n`;
+        if (savedOrder.date)  msg += `📅 Fecha: ${savedOrder.date}\n`;
+        if (paymentId)        msg += `\nReferencia de pago: #${paymentId}`;
+
+        waBtn.href = `https://wa.me/524613504042?text=${encodeURIComponent(msg)}`;
+
+        // Clear stored order
+        sessionStorage.removeItem('pendingOrder');
+    }
+</script>
+</body>
+</html>
