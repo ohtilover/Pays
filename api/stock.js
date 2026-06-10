@@ -82,11 +82,18 @@ export default async function handler(req, res) {
 
         try {
             // ── set_limit: owner sets daily production limit ──────────────
-            // e.g. "I make 2 pays de queso per day"
-            // This does NOT change current stock — only the morning reset uses it
             if (action === 'set_limit') {
                 const limit = Math.max(0, parseInt(value, 10) || 0);
                 await kv('SET', `stock:limit:${id}`, String(limit));
+
+                // If no current stock set yet, initialize it to the limit
+                // This way setting a limit of 2 immediately shows "2 available"
+                // instead of showing ∞ until the next cron reset
+                const existing = await kv('GET', `stock:current:${id}`);
+                if (existing === null || existing === undefined) {
+                    await kv('SET', `stock:current:${id}`, String(limit));
+                }
+
                 return res.status(200).json({ ok: true, id, limit });
             }
 
