@@ -336,12 +336,16 @@
         <!-- Tabs -->
         <div style="display:flex; border-bottom:1px solid rgba(180,143,212,0.2); flex-shrink:0; background:white;">
             <button id="tab-orders-btn" onclick="switchTab('orders')"
-                    style="flex:1; padding:12px; border:none; background:none; cursor:pointer; font-size:13px; font-weight:600; color:#9B6DC5; border-bottom:2px solid #9B6DC5;">
+                    style="flex:1; padding:12px; border:none; background:none; cursor:pointer; font-size:12px; font-weight:600; color:#9B6DC5; border-bottom:2px solid #9B6DC5;">
                 📋 Pedidos
             </button>
+            <button id="tab-analytics-btn" onclick="switchTab('analytics')"
+                    style="flex:1; padding:12px; border:none; background:none; cursor:pointer; font-size:12px; font-weight:500; color:rgba(42,26,53,0.4); border-bottom:2px solid transparent;">
+                📊 Analytics
+            </button>
             <button id="tab-stock-btn" onclick="switchTab('stock')"
-                    style="flex:1; padding:12px; border:none; background:none; cursor:pointer; font-size:13px; font-weight:500; color:rgba(42,26,53,0.4); border-bottom:2px solid transparent;">
-                📦 Inventario
+                    style="flex:1; padding:12px; border:none; background:none; cursor:pointer; font-size:12px; font-weight:500; color:rgba(42,26,53,0.4); border-bottom:2px solid transparent;">
+                📦 Stock
             </button>
         </div>
 
@@ -355,6 +359,52 @@
                 <div style="text-align:center; padding:48px 24px; color:rgba(42,26,53,0.35);">
                     <div style="font-size:32px; margin-bottom:8px;">📋</div>
                     <p style="font-size:13px;">Cargando pedidos...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ANALYTICS TAB -->
+        <div id="tab-analytics" style="flex:1; overflow-y:auto; display:none; flex-direction:column;">
+            <div style="padding:12px 20px 6px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+                <p style="font-size:11px; color:rgba(42,26,53,0.4); font-weight:500;">Últimos 7 días</p>
+                <button onclick="loadAnalytics()" style="font-size:11px; font-weight:600; color:#9B6DC5; background:none; border:none; cursor:pointer;">↻ Actualizar</button>
+            </div>
+            <div id="admin-analytics-content" style="padding:0 16px 40px;">
+                <!-- Stat cards -->
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:8px;">
+                    <div style="background:white; border-radius:12px; padding:14px; border:1px solid rgba(180,143,212,0.18);">
+                        <p style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:rgba(42,26,53,0.4); margin-bottom:4px;">Ingresos</p>
+                        <p id="stat-revenue" class="font-serif" style="font-size:22px; font-weight:600; color:#2A1A35;">—</p>
+                    </div>
+                    <div style="background:white; border-radius:12px; padding:14px; border:1px solid rgba(180,143,212,0.18);">
+                        <p style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:rgba(42,26,53,0.4); margin-bottom:4px;">Pedidos</p>
+                        <p id="stat-orders" class="font-serif" style="font-size:22px; font-weight:600; color:#2A1A35;">—</p>
+                    </div>
+                    <div style="background:white; border-radius:12px; padding:14px; border:1px solid rgba(180,143,212,0.18);">
+                        <p style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:rgba(42,26,53,0.4); margin-bottom:4px;">Promedio</p>
+                        <p id="stat-avg" class="font-serif" style="font-size:22px; font-weight:600; color:#2A1A35;">—</p>
+                    </div>
+                    <div style="background:white; border-radius:12px; padding:14px; border:1px solid rgba(180,143,212,0.18);">
+                        <p style="font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:0.07em; color:rgba(42,26,53,0.4); margin-bottom:4px;">Hoy</p>
+                        <p id="stat-today" class="font-serif" style="font-size:22px; font-weight:600; color:#2A1A35;">—</p>
+                    </div>
+                </div>
+
+                <!-- Revenue bar chart -->
+                <div style="background:white; border-radius:12px; padding:16px; border:1px solid rgba(180,143,212,0.18); margin-top:10px;">
+                    <p style="font-size:11px; font-weight:600; color:rgba(42,26,53,0.5); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:14px;">Ingresos últimos 7 días</p>
+                    <div id="revenue-chart" style="display:flex; align-items:flex-end; gap:6px; height:80px; margin-bottom:8px;">
+                        <!-- bars injected by JS -->
+                    </div>
+                    <div id="revenue-chart-labels" style="display:flex; gap:6px;">
+                        <!-- labels injected by JS -->
+                    </div>
+                </div>
+
+                <!-- Top products -->
+                <div style="background:white; border-radius:12px; padding:16px; border:1px solid rgba(180,143,212,0.18); margin-top:10px;">
+                    <p style="font-size:11px; font-weight:600; color:rgba(42,26,53,0.5); text-transform:uppercase; letter-spacing:0.07em; margin-bottom:12px;">Productos más pedidos</p>
+                    <div id="top-products-list"></div>
                 </div>
             </div>
         </div>
@@ -1565,6 +1615,7 @@
             document.getElementById('admin-controls').style.display = 'flex';
             renderAdminList();
             loadOrders();
+            loadAnalytics();
         } catch (e) {
             err.textContent = 'Error de conexión';
             err.style.display = 'block';
@@ -1572,30 +1623,127 @@
     }
 
     // ── Tab switching ─────────────────────────────────────────────────────
+    // This function shows one tab and hides the others.
+    // It also updates the visual state of each button (active = purple underline)
+    // This pattern — one active view at a time — is used in every app with tabs.
     function switchTab(tab) {
-        const ordersTab  = document.getElementById('tab-orders');
-        const stockTab   = document.getElementById('tab-stock');
-        const ordersBtn  = document.getElementById('tab-orders-btn');
-        const stockBtn   = document.getElementById('tab-stock-btn');
+        const tabs = ['orders', 'analytics', 'stock'];
 
-        if (tab === 'orders') {
-            ordersTab.style.display = 'flex';
-            stockTab.style.display  = 'none';
-            ordersBtn.style.color       = '#9B6DC5';
-            ordersBtn.style.fontWeight  = '600';
-            ordersBtn.style.borderBottom = '2px solid #9B6DC5';
-            stockBtn.style.color        = 'rgba(42,26,53,0.4)';
-            stockBtn.style.fontWeight   = '500';
-            stockBtn.style.borderBottom = '2px solid transparent';
-        } else {
-            ordersTab.style.display = 'none';
-            stockTab.style.display  = 'flex';
-            stockBtn.style.color        = '#9B6DC5';
-            stockBtn.style.fontWeight   = '600';
-            stockBtn.style.borderBottom = '2px solid #9B6DC5';
-            ordersBtn.style.color       = 'rgba(42,26,53,0.4)';
-            ordersBtn.style.fontWeight  = '500';
-            ordersBtn.style.borderBottom = '2px solid transparent';
+        tabs.forEach(t => {
+            const panel = document.getElementById(`tab-${t}`);
+            const btn   = document.getElementById(`tab-${t}-btn`);
+            const active = t === tab;
+
+            panel.style.display    = active ? 'flex' : 'none';
+            btn.style.color        = active ? '#9B6DC5' : 'rgba(42,26,53,0.4)';
+            btn.style.fontWeight   = active ? '600' : '500';
+            btn.style.borderBottom = active ? '2px solid #9B6DC5' : '2px solid transparent';
+        });
+
+        // Load data when switching to a tab
+        if (tab === 'analytics') loadAnalytics();
+    }
+
+    // ── Load and render analytics ─────────────────────────────────────────
+    // This calls our /api/analytics endpoint and renders the result.
+    // Notice: the API does all the math, the frontend just displays numbers.
+    // That separation (compute on server, display on client) is a core principle.
+    async function loadAnalytics() {
+        // Reset to loading state
+        ['stat-revenue','stat-orders','stat-avg','stat-today'].forEach(id => {
+            document.getElementById(id).textContent = '...';
+        });
+
+        try {
+            const res  = await fetch('/api/analytics', {
+                headers: { 'Authorization': `Bearer ${adminToken}` }
+            });
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error);
+
+            // ── Stat cards ────────────────────────────────────────────────
+            document.getElementById('stat-revenue').textContent = `MX$${data.totalRevenue.toLocaleString()}`;
+            document.getElementById('stat-orders').textContent  = data.totalOrders;
+            document.getElementById('stat-avg').textContent     = `MX$${data.averageOrder}`;
+
+            // Today's revenue — find today's key in last7Days
+            const todayKey   = new Date().toISOString().slice(0, 10);
+            const todayTotal = data.last7Days[todayKey] || 0;
+            document.getElementById('stat-today').textContent = `MX$${todayTotal}`;
+
+            // ── Bar chart ─────────────────────────────────────────────────
+            // A bar chart is just divs with heights proportional to their value.
+            // max value = tallest bar = 100% height. Others are scaled down.
+            // e.g. if max is MX$400, a MX$200 day gets 50% height.
+            const chartEl  = document.getElementById('revenue-chart');
+            const labelsEl = document.getElementById('revenue-chart-labels');
+            chartEl.innerHTML  = '';
+            labelsEl.innerHTML = '';
+
+            const days   = Object.entries(data.last7Days); // [['2025-06-01', 400], ...]
+            const maxVal = Math.max(...days.map(d => d[1]), 1); // avoid divide by zero
+
+            const dayNames = ['Do','Lu','Ma','Mi','Ju','Vi','Sá'];
+
+            days.forEach(([dateStr, value]) => {
+                const heightPct = Math.round((value / maxVal) * 100);
+                const isToday   = dateStr === todayKey;
+                const dayOfWeek = new Date(dateStr + 'T12:00:00').getDay();
+
+                // Bar
+                const bar = document.createElement('div');
+                bar.style.cssText = `
+                    flex: 1;
+                    height: ${Math.max(heightPct, 4)}%;
+                    background: ${isToday ? '#9B6DC5' : 'rgba(180,143,212,0.35)'};
+                    border-radius: 4px 4px 0 0;
+                    position: relative;
+                    transition: height 0.4s ease;
+                    min-height: 4px;
+                `;
+                // Tooltip on tap — shows the value
+                bar.title = `MX$${value}`;
+                chartEl.appendChild(bar);
+
+                // Label
+                const label = document.createElement('div');
+                label.style.cssText = `flex:1; text-align:center; font-size:9px; font-weight:${isToday ? '700' : '500'}; color:${isToday ? '#9B6DC5' : 'rgba(42,26,53,0.4)'};`;
+                label.textContent = dayNames[dayOfWeek];
+                labelsEl.appendChild(label);
+            });
+
+            // ── Top products ──────────────────────────────────────────────
+            // Each product gets a bar showing its share of total orders.
+            // This is called a "horizontal bar chart" — same concept, rotated.
+            const topEl = document.getElementById('top-products-list');
+            topEl.innerHTML = '';
+
+            if (!data.topProducts.length) {
+                topEl.innerHTML = `<p style="font-size:12px;color:rgba(42,26,53,0.35);text-align:center;padding:16px 0;">Sin datos aún</p>`;
+            } else {
+                const maxCount = data.topProducts[0].count; // already sorted desc
+                data.topProducts.forEach((p, i) => {
+                    const barWidth = Math.round((p.count / maxCount) * 100);
+                    const row = document.createElement('div');
+                    row.style.cssText = 'margin-bottom:10px;';
+                    row.innerHTML = `
+                        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px;">
+                            <p style="font-size:12px;font-weight:500;color:#2A1A35;flex:1;padding-right:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</p>
+                            <span style="font-size:11px;font-weight:700;color:#9B6DC5;flex-shrink:0;">${p.count} ${p.count === 1 ? 'vez' : 'veces'}</span>
+                        </div>
+                        <div style="height:6px;background:rgba(42,26,53,0.06);border-radius:3px;overflow:hidden;">
+                            <div style="height:100%;width:${barWidth}%;background:${i === 0 ? '#9B6DC5' : 'rgba(180,143,212,0.5)'};border-radius:3px;transition:width 0.4s ease;"></div>
+                        </div>`;
+                    topEl.appendChild(row);
+                });
+            }
+
+        } catch (e) {
+            console.error('Analytics load error:', e);
+            document.getElementById('stat-revenue').textContent = '—';
+            document.getElementById('stat-orders').textContent  = '—';
+            document.getElementById('stat-avg').textContent     = '—';
+            document.getElementById('stat-today').textContent   = '—';
         }
     }
 
