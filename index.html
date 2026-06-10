@@ -1673,7 +1673,7 @@
             const res = await fetch('/api/stock', {
                 method:  'POST',
                 headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${pw}` },
-                body: JSON.stringify({ action: 'adjust', id: '__test__', value: 0 }),
+                body: JSON.stringify({ action: 'reset_all' }),
             });
             if (res.status === 401) {
                 err.style.display = 'block';
@@ -2017,6 +2017,21 @@
                 body: JSON.stringify({ action: 'set_limit', id, value: limit }),
             });
             stockData.limits[id] = limit;
+
+            // If no current stock set yet, mirror the limit locally too
+            if (stockData.current[id] === null || stockData.current[id] === undefined) {
+                stockData.current[id] = limit;
+                // Update the displayed count
+                const countEl = document.getElementById(`stock-count-${id}`);
+                const dotEl   = document.getElementById(`status-dot-${id}`);
+                if (countEl) {
+                    countEl.textContent = limit;
+                    countEl.style.color = limit > 0 ? '#2A1A35' : '#b03a3a';
+                }
+                if (dotEl) dotEl.style.background = limit > 0 ? '#5fa852' : '#b03a3a';
+                applyStockToMenu();
+            }
+
             showSavedBanner();
         } catch (e) {
             console.error('Save limit failed', e);
