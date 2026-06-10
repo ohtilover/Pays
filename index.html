@@ -302,7 +302,7 @@
     <div style="background:#2A1A35; padding:16px 20px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
         <div>
             <p style="font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:0.1em; color:rgba(180,143,212,0.7); margin-bottom:2px;">Panel de administración</p>
-            <h2 style="font-size:18px; font-weight:600; color:white; font-family:'Cormorant Garamond',serif;">Control de inventario</h2>
+            <h2 style="font-size:18px; font-weight:600; color:white; font-family:'Cormorant Garamond',serif;">El hada de los pays</h2>
         </div>
         <button onclick="closeAdmin()"
                 style="width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.1);border:none;cursor:pointer;color:white;font-size:16px;display:flex;align-items:center;justify-content:center;">✕</button>
@@ -324,19 +324,48 @@
         </button>
     </div>
 
-    <!-- Stock controls (shown after login) -->
+    <!-- Authenticated view -->
     <div id="admin-controls" style="display:none; flex-direction:column; flex:1; overflow:hidden;">
+
         <!-- Save banner -->
         <div id="admin-saved-banner"
              style="display:none; background:rgba(95,168,82,0.12); border-bottom:1px solid rgba(95,168,82,0.25); padding:10px 20px; text-align:center; font-size:12px; font-weight:600; color:#3d7a32;">
             ✓ Cambios guardados
         </div>
 
-        <div style="padding:12px 20px 6px; border-bottom:1px solid rgba(180,143,212,0.15); flex-shrink:0;">
-            <p style="font-size:11px; color:rgba(42,26,53,0.4); font-weight:500;">Activa o desactiva la disponibilidad de cada producto. Los cambios se guardan al instante.</p>
+        <!-- Tabs -->
+        <div style="display:flex; border-bottom:1px solid rgba(180,143,212,0.2); flex-shrink:0; background:white;">
+            <button id="tab-orders-btn" onclick="switchTab('orders')"
+                    style="flex:1; padding:12px; border:none; background:none; cursor:pointer; font-size:13px; font-weight:600; color:#9B6DC5; border-bottom:2px solid #9B6DC5;">
+                📋 Pedidos
+            </button>
+            <button id="tab-stock-btn" onclick="switchTab('stock')"
+                    style="flex:1; padding:12px; border:none; background:none; cursor:pointer; font-size:13px; font-weight:500; color:rgba(42,26,53,0.4); border-bottom:2px solid transparent;">
+                📦 Inventario
+            </button>
         </div>
 
-        <div id="admin-product-list" style="flex:1; overflow-y:auto; padding:0 20px 40px;"></div>
+        <!-- ORDERS TAB -->
+        <div id="tab-orders" style="flex:1; overflow-y:auto; display:flex; flex-direction:column;">
+            <div style="padding:12px 20px 6px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0;">
+                <p style="font-size:11px; color:rgba(42,26,53,0.4); font-weight:500;">Pedidos pagados más recientes</p>
+                <button onclick="loadOrders()" style="font-size:11px; font-weight:600; color:#9B6DC5; background:none; border:none; cursor:pointer;">↻ Actualizar</button>
+            </div>
+            <div id="admin-orders-list" style="padding:0 16px 40px; flex:1;">
+                <div style="text-align:center; padding:48px 24px; color:rgba(42,26,53,0.35);">
+                    <div style="font-size:32px; margin-bottom:8px;">📋</div>
+                    <p style="font-size:13px;">Cargando pedidos...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- STOCK TAB -->
+        <div id="tab-stock" style="flex:1; overflow-y:auto; display:none; flex-direction:column;">
+            <div style="padding:12px 20px 6px; border-bottom:1px solid rgba(180,143,212,0.15); flex-shrink:0;">
+                <p style="font-size:11px; color:rgba(42,26,53,0.4); font-weight:500;">Activa o desactiva la disponibilidad de cada producto.</p>
+            </div>
+            <div id="admin-product-list" style="flex:1; overflow-y:auto; padding:0 20px 40px;"></div>
+        </div>
     </div>
 </div>
 <div id="cart-overlay"
@@ -581,6 +610,20 @@
         </div>
         <p style="font-size:11px; color:rgba(42,26,53,0.4); margin-bottom:12px; margin-top:-8px;">5 variedades · Pieza entera</p>
         <div style="display:flex; flex-direction:column; gap:10px;">
+
+            <!-- TEST PRODUCT — remove after payment testing -->
+            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:2px dashed rgba(155,109,197,0.35);display:flex;align-items:center;gap:12px;"
+                 data-id="test-peso" data-name="🧪 Producto de prueba" data-price="1">
+                <div style="width:60px;height:60px;border-radius:10px;flex-shrink:0;background:rgba(155,109,197,0.08);display:flex;align-items:center;justify-content:center;font-size:24px;">🧪</div>
+                <div style="flex:1;min-width:0;">
+                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                        <h4 style="font-size:14px;font-weight:600;color:#9B6DC5;">Producto de prueba</h4>
+                        <span class="price-tag" style="color:#9B6DC5;">MX$1</span>
+                    </div>
+                    <p style="font-size:10px;color:rgba(42,26,53,0.35);margin-top:2px;">Solo para pruebas · Eliminar después</p>
+                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+                </div>
+            </div>
 
             <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
                  data-id="pay-strudel-manzana" data-name="Strudel de manzana" data-price="130">
@@ -1399,6 +1442,7 @@
 
     // All product IDs and names (must match data-id on cards)
     const ALL_PRODUCTS = [
+        { id: 'test-peso',               name: '🧪 Producto de prueba' },
         { id: 'pay-strudel-manzana',     name: 'Strudel de manzana' },
         { id: 'pay-queso',               name: 'Pay de queso' },
         { id: 'pay-queso-fruta-choco',   name: 'Pay de queso con fruta y/o chocolate' },
@@ -1504,7 +1548,6 @@
         const err   = document.getElementById('admin-error');
         if (!pw) return;
 
-        // Test the password against the API (POST with wrong body will 401)
         try {
             const res = await fetch('/api/stock', {
                 method:  'POST',
@@ -1516,15 +1559,136 @@
                 input.style.borderColor = '#b03a3a';
                 return;
             }
-            // Success — store token, show controls
             adminToken = pw;
             err.style.display = 'none';
             document.getElementById('admin-login').style.display    = 'none';
             document.getElementById('admin-controls').style.display = 'flex';
             renderAdminList();
+            loadOrders();
         } catch (e) {
             err.textContent = 'Error de conexión';
             err.style.display = 'block';
+        }
+    }
+
+    // ── Tab switching ─────────────────────────────────────────────────────
+    function switchTab(tab) {
+        const ordersTab  = document.getElementById('tab-orders');
+        const stockTab   = document.getElementById('tab-stock');
+        const ordersBtn  = document.getElementById('tab-orders-btn');
+        const stockBtn   = document.getElementById('tab-stock-btn');
+
+        if (tab === 'orders') {
+            ordersTab.style.display = 'flex';
+            stockTab.style.display  = 'none';
+            ordersBtn.style.color       = '#9B6DC5';
+            ordersBtn.style.fontWeight  = '600';
+            ordersBtn.style.borderBottom = '2px solid #9B6DC5';
+            stockBtn.style.color        = 'rgba(42,26,53,0.4)';
+            stockBtn.style.fontWeight   = '500';
+            stockBtn.style.borderBottom = '2px solid transparent';
+        } else {
+            ordersTab.style.display = 'none';
+            stockTab.style.display  = 'flex';
+            stockBtn.style.color        = '#9B6DC5';
+            stockBtn.style.fontWeight   = '600';
+            stockBtn.style.borderBottom = '2px solid #9B6DC5';
+            ordersBtn.style.color       = 'rgba(42,26,53,0.4)';
+            ordersBtn.style.fontWeight  = '500';
+            ordersBtn.style.borderBottom = '2px solid transparent';
+        }
+    }
+
+    // ── Load orders from API ──────────────────────────────────────────────
+    async function loadOrders() {
+        const list = document.getElementById('admin-orders-list');
+        list.innerHTML = `<div style="text-align:center;padding:32px;color:rgba(42,26,53,0.35);"><p style="font-size:13px;">Cargando...</p></div>`;
+
+        try {
+            const res  = await fetch('/api/orders', {
+                headers: { 'Authorization': `Bearer ${adminToken}` }
+            });
+            const data = await res.json();
+
+            if (!data.ok || !data.orders.length) {
+                list.innerHTML = `
+                    <div style="text-align:center;padding:48px 24px;color:rgba(42,26,53,0.35);">
+                        <div style="font-size:32px;margin-bottom:8px;">🧺</div>
+                        <p style="font-size:13px;font-weight:500;">Sin pedidos aún</p>
+                        <p style="font-size:11px;margin-top:4px;">Los pedidos pagados aparecerán aquí</p>
+                    </div>`;
+                return;
+            }
+
+            list.innerHTML = '';
+            data.orders.forEach(order => renderOrderCard(order, list));
+
+        } catch (e) {
+            list.innerHTML = `<div style="text-align:center;padding:32px;color:#b03a3a;font-size:12px;">Error al cargar pedidos</div>`;
+        }
+    }
+
+    // ── Render a single order card ────────────────────────────────────────
+    function renderOrderCard(order, container) {
+        const statusColors = {
+            pendiente:       { bg: 'rgba(230,161,92,0.12)', border: 'rgba(230,161,92,0.3)',  text: '#8a5a00' },
+            'en preparación':{ bg: 'rgba(155,109,197,0.10)', border: 'rgba(155,109,197,0.3)', text: '#6b3fa0' },
+            listo:           { bg: 'rgba(95,168,82,0.10)',  border: 'rgba(95,168,82,0.3)',   text: '#3d7a32' },
+        };
+        const status = order.status_label || 'pendiente';
+        const sc     = statusColors[status] || statusColors['pendiente'];
+
+        const paidAt = order.paidAt
+            ? new Date(order.paidAt).toLocaleDateString('es-MX', { day:'numeric', month:'short', hour:'2-digit', minute:'2-digit' })
+            : '—';
+
+        const card = document.createElement('div');
+        card.style.cssText = 'background:white;border-radius:14px;padding:14px;border:1px solid rgba(180,143,212,0.18);margin-bottom:10px;';
+        card.innerHTML = `
+            <!-- Order header -->
+            <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px;">
+                <div>
+                    <p style="font-size:12px;font-weight:700;color:#2A1A35;">Pedido #${String(order.paymentId).slice(-6)}</p>
+                    <p style="font-size:10px;color:rgba(42,26,53,0.4);margin-top:2px;">${paidAt}</p>
+                </div>
+                <span style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:#2A1A35;">MX$${order.total}</span>
+            </div>
+
+            <!-- Order items -->
+            <div style="background:rgba(42,26,53,0.03);border-radius:8px;padding:8px 10px;margin-bottom:10px;">
+                <p style="font-size:11px;color:rgba(42,26,53,0.6);line-height:1.6;">${order.summary || '—'}</p>
+            </div>
+
+            ${order.date && order.date !== 'No especificada' ? `
+            <div style="display:flex;align-items:center;gap:5px;margin-bottom:10px;">
+                <span style="font-size:11px;">📅</span>
+                <p style="font-size:11px;color:rgba(42,26,53,0.55);font-weight:500;">${order.date}</p>
+            </div>` : ''}
+
+            <!-- Status selector -->
+            <div style="display:flex;gap:6px;flex-wrap:wrap;">
+                ${['pendiente','en preparación','listo'].map(s => `
+                    <button onclick="updateOrderStatus('${order.paymentId}', '${s}', this)"
+                            style="font-size:10px;font-weight:600;padding:5px 10px;border-radius:6px;border:1px solid ${s===status ? sc.border : 'rgba(42,26,53,0.12)'};background:${s===status ? sc.bg : 'transparent'};color:${s===status ? sc.text : 'rgba(42,26,53,0.4)'};cursor:pointer;transition:all 0.15s;">
+                        ${s === 'pendiente' ? '⏳' : s === 'en preparación' ? '👩‍🍳' : '✅'} ${s}
+                    </button>`).join('')}
+            </div>`;
+
+        container.appendChild(card);
+    }
+
+    // ── Update order status ───────────────────────────────────────────────
+    async function updateOrderStatus(paymentId, newStatus, btn) {
+        try {
+            await fetch('/api/orders', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                body: JSON.stringify({ paymentId, status: newStatus }),
+            });
+            // Reload orders to reflect change
+            loadOrders();
+        } catch (e) {
+            console.error('Status update failed', e);
         }
     }
 
