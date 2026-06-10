@@ -13,9 +13,18 @@
 //   The webhook subtracts from current when an online order lands.
 //   She taps +/- in admin to adjust current when she sells in person.
 
-const KV_URL       = process.env.KV_REST_API_URL;
-const KV_TOKEN     = process.env.KV_REST_API_TOKEN;
-const ADMIN_SECRET = process.env.admin_secret;
+const KV_URL          = process.env.KV_REST_API_URL;
+const KV_TOKEN        = process.env.KV_REST_API_TOKEN;
+const ADMIN_SECRET    = process.env.admin_secret;
+const EMPLOYEE_SECRET = process.env.EMPLOYEE_SECRET;
+
+// Returns 'admin', 'employee', or null
+function getRole(req) {
+    const token = (req.headers['authorization'] || '').replace('Bearer ', '').trim();
+    if (token === ADMIN_SECRET)    return 'admin';
+    if (token === EMPLOYEE_SECRET) return 'employee';
+    return null;
+}
 
 async function kv(command, ...args) {
     const res = await fetch(KV_URL, {
@@ -75,10 +84,16 @@ export default async function handler(req, res) {
 
     // ── POST: admin actions ───────────────────────────────────────────────
     if (req.method === 'POST') {
-        const token = (req.headers['authorization'] || '').replace('Bearer ', '').trim();
-        if (token !== ADMIN_SECRET) return res.status(401).json({ ok: false, error: 'Unauthorized' });
+        const role = getRole(req);
+        if (!role) return res.status(401).json({ ok: false, error: 'Unauthorized' });
 
         const { action, id, value } = req.body;
+
+        // Employees can only adjust stock (for in-person sales via POS)
+        // set_limit and reset_all are admin-only
+        if (role === 'employee' && action !== 'adjust') {
+            return res.status(403).json({ ok: false, error: 'Insufficient permissions' });
+        }
 
         try {
             // ── set_limit: owner sets daily production limit ──────────────
