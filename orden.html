@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estado de tu pedido | El hada de los pays</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #FAF7FB;
+            color: #2A1A35;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 32px 20px;
+            -webkit-font-smoothing: antialiased;
+        }
+        .font-serif { font-family: 'Cormorant Garamond', serif; }
+        .container { max-width: 380px; width: 100%; }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 26px;
+            font-weight: 600;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+        .ref {
+            text-align: center;
+            font-size: 12px;
+            color: rgba(42,26,53,0.4);
+            margin-bottom: 28px;
+        }
+
+        /* ── Progress tracker ── */
+        .tracker {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 32px;
+            padding: 0 8px;
+        }
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            position: relative;
+        }
+        .step-circle {
+            width: 44px; height: 44px;
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 18px;
+            background: rgba(42,26,53,0.06);
+            border: 2px solid rgba(42,26,53,0.1);
+            transition: all 0.4s ease;
+            z-index: 1;
+        }
+        .step-label {
+            font-size: 10px;
+            font-weight: 600;
+            margin-top: 8px;
+            text-align: center;
+            color: rgba(42,26,53,0.35);
+            transition: color 0.4s ease;
+            max-width: 70px;
+        }
+        .step-line {
+            position: absolute;
+            top: 22px;
+            left: 50%;
+            width: 100%;
+            height: 2px;
+            background: rgba(42,26,53,0.1);
+            z-index: 0;
+            transition: background 0.4s ease;
+        }
+        .step:last-child .step-line { display: none; }
+
+        .step.active .step-circle {
+            background: #9B6DC5;
+            border-color: #9B6DC5;
+            color: white;
+            transform: scale(1.08);
+            box-shadow: 0 4px 16px rgba(155,109,197,0.35);
+        }
+        .step.active .step-label { color: #9B6DC5; font-weight: 700; }
+        .step.done .step-circle {
+            background: #5fa852;
+            border-color: #5fa852;
+            color: white;
+        }
+        .step.done .step-label { color: #3d7a32; }
+        .step.done .step-line,
+        .step.active .step-line { background: #5fa852; }
+
+        /* ── Status banner ── */
+        .status-banner {
+            border-radius: 14px;
+            padding: 18px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        .status-banner.pendiente   { background: rgba(230,161,92,0.12); border: 1px solid rgba(230,161,92,0.25); }
+        .status-banner.preparacion { background: rgba(155,109,197,0.10); border: 1px solid rgba(155,109,197,0.25); }
+        .status-banner.listo       { background: rgba(95,168,82,0.10); border: 1px solid rgba(95,168,82,0.25); }
+
+        .status-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .status-banner.pendiente   .status-title { color: #8a5a00; }
+        .status-banner.preparacion .status-title { color: #6b3fa0; }
+        .status-banner.listo       .status-title { color: #3d7a32; }
+
+        .status-desc {
+            font-size: 12px;
+            color: rgba(42,26,53,0.55);
+        }
+
+        /* ── Order details ── */
+        .details {
+            background: white;
+            border-radius: 14px;
+            padding: 16px;
+            border: 1px solid rgba(180,143,212,0.18);
+            margin-bottom: 16px;
+        }
+        .details-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(42,26,53,0.06);
+        }
+        .details-row:last-child { border-bottom: none; }
+        .details-label { color: rgba(42,26,53,0.45); }
+        .details-value { font-weight: 600; color: #2A1A35; text-align: right; max-width: 60%; }
+
+        /* ── Footer ── */
+        .footer-note {
+            text-align: center;
+            font-size: 11px;
+            color: rgba(42,26,53,0.35);
+            line-height: 1.6;
+        }
+        .wa-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            background: #25D366;
+            color: white;
+            font-weight: 700;
+            font-size: 13px;
+            border-radius: 12px;
+            padding: 13px;
+            text-decoration: none;
+            margin: 16px 0;
+            box-shadow: 0 2px 12px rgba(37,211,102,0.25);
+        }
+
+        .loading, .error-box {
+            text-align: center;
+            padding: 60px 20px;
+            color: rgba(42,26,53,0.4);
+        }
+        .error-box { color: #b03a3a; }
+
+        .pulse {
+            display: inline-block;
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: #5fa852;
+            margin-right: 5px;
+            animation: pulse 1.6s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+
+    <div id="loading" class="loading">
+        <div style="font-size:32px; margin-bottom:8px;">🥧</div>
+        <p style="font-size:13px;">Buscando tu pedido...</p>
+    </div>
+
+    <div id="error" class="error-box" style="display:none;">
+        <div style="font-size:32px; margin-bottom:8px;">😕</div>
+        <p style="font-size:14px; font-weight:600; margin-bottom:4px;">No encontramos tu pedido</p>
+        <p style="font-size:12px; color:rgba(42,26,53,0.4);">Verifica el link o contacta al negocio por WhatsApp.</p>
+    </div>
+
+    <div id="content" style="display:none;">
+        <h1>Estado de tu pedido</h1>
+        <p class="ref" id="order-ref"></p>
+
+        <!-- Progress tracker -->
+        <div class="tracker">
+            <div class="step" id="step-pendiente">
+                <div class="step-circle">⏳</div>
+                <div class="step-line"></div>
+                <div class="step-label">Recibido</div>
+            </div>
+            <div class="step" id="step-preparacion">
+                <div class="step-circle">👩‍🍳</div>
+                <div class="step-line"></div>
+                <div class="step-label">En preparación</div>
+            </div>
+            <div class="step" id="step-listo">
+                <div class="step-circle">✅</div>
+                <div class="step-line"></div>
+                <div class="step-label">Listo</div>
+            </div>
+        </div>
+
+        <!-- Status banner -->
+        <div class="status-banner" id="status-banner">
+            <p class="status-title" id="status-title"></p>
+            <p class="status-desc" id="status-desc"></p>
+        </div>
+
+        <!-- Order details -->
+        <div class="details">
+            <div class="details-row">
+                <span class="details-label">Pedido</span>
+                <span class="details-value" id="detail-items"></span>
+            </div>
+            <div class="details-row">
+                <span class="details-label">Total</span>
+                <span class="details-value" id="detail-total"></span>
+            </div>
+            <div class="details-row" id="row-date" style="display:none;">
+                <span class="details-label">Fecha de entrega</span>
+                <span class="details-value" id="detail-date"></span>
+            </div>
+        </div>
+
+        <a id="wa-btn" class="wa-btn" href="#" target="_blank">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" style="width:18px;height:18px;flex-shrink:0;">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.109.549 4.09 1.508 5.815L0 24l6.348-1.485A11.934 11.934 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 21.818a9.797 9.797 0 01-5.001-1.371l-.357-.213-3.769.882.915-3.667-.234-.376A9.768 9.768 0 012.182 12C2.182 6.58 6.58 2.182 12 2.182S21.818 6.58 21.818 12 17.42 21.818 12 21.818z"/>
+            </svg>
+            Preguntar por WhatsApp
+        </a>
+
+        <p class="footer-note">
+            <span class="pulse"></span>Esta pagina se actualiza automaticamente.<br>
+            Guarda este link para revisar el estado mas tarde.
+        </p>
+    </div>
+
+</div>
+
+<script>
+    const params    = new URLSearchParams(window.location.search);
+    const orderId   = params.get('id');
+
+    const loadingEl = document.getElementById('loading');
+    const errorEl   = document.getElementById('error');
+    const contentEl = document.getElementById('content');
+
+    if (!orderId) {
+        loadingEl.style.display = 'none';
+        errorEl.style.display   = 'block';
+    } else {
+        fetchStatus();
+        // Poll every 15 seconds for live updates
+        setInterval(fetchStatus, 15000);
+    }
+
+    async function fetchStatus() {
+        try {
+            const res  = await fetch(`/api/order-status?id=${orderId}`);
+            const data = await res.json();
+
+            if (!data.ok) {
+                loadingEl.style.display = 'none';
+                errorEl.style.display   = 'block';
+                return;
+            }
+
+            render(data);
+
+            loadingEl.style.display = 'none';
+            errorEl.style.display   = 'none';
+            contentEl.style.display = 'block';
+
+        } catch (e) {
+            loadingEl.style.display = 'none';
+            errorEl.style.display   = 'block';
+        }
+    }
+
+    function render(data) {
+        document.getElementById('order-ref').textContent = `Pedido #${orderId.slice(-6)}`;
+
+        // ── Progress tracker ──
+        const steps = ['pendiente', 'preparacion', 'listo'];
+        // Map status_label values to step keys
+        const statusMap = {
+            'pendiente':       'pendiente',
+            'en preparación':  'preparacion',
+            'en preparacion':  'preparacion',
+            'listo':           'listo',
+        };
+        const currentStep = statusMap[data.status] || 'pendiente';
+        const currentIdx  = steps.indexOf(currentStep);
+
+        steps.forEach((s, i) => {
+            const el = document.getElementById(`step-${s}`);
+            el.classList.remove('active', 'done');
+            if (i < currentIdx) el.classList.add('done');
+            else if (i === currentIdx) el.classList.add('active');
+        });
+
+        // ── Status banner ──
+        const banner = document.getElementById('status-banner');
+        const title   = document.getElementById('status-title');
+        const desc    = document.getElementById('status-desc');
+
+        banner.className = `status-banner ${currentStep}`;
+
+        const messages = {
+            pendiente: {
+                title: '⏳ Pedido recibido',
+                desc:  'Hemos recibido tu pago y pronto comenzaremos a prepararlo.',
+            },
+            preparacion: {
+                title: '👩‍🍳 ¡Preparando tu pedido!',
+                desc:  'Estamos haciendo tu pedido con mucho cariño.',
+            },
+            listo: {
+                title: '✅ ¡Tu pedido esta listo!',
+                desc:  'Puedes pasar a recogerlo o esperamos tu entrega.',
+            },
+        };
+        title.textContent = messages[currentStep].title;
+        desc.textContent  = messages[currentStep].desc;
+
+        // ── Order details ──
+        document.getElementById('detail-items').textContent = data.summary || '—';
+        document.getElementById('detail-total').textContent = `MX$${data.total}`;
+
+        if (data.date && data.date !== 'No especificada') {
+            document.getElementById('row-date').style.display = 'flex';
+            document.getElementById('detail-date').textContent = data.date;
+        }
+
+        // ── WhatsApp button ──
+        const msg = `Hola! Quiero preguntar sobre mi pedido #${orderId.slice(-6)} (${data.summary})`;
+        document.getElementById('wa-btn').href = `https://wa.me/524613504042?text=${encodeURIComponent(msg)}`;
+    }
+</script>
+</body>
+</html>
