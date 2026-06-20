@@ -352,6 +352,10 @@
                     style="flex:1; padding:10px 4px; border:none; background:none; cursor:pointer; font-size:11px; font-weight:500; color:rgba(42,26,53,0.4); border-bottom:2px solid transparent;">
                 📦 Stock
             </button>
+            <button id="tab-catalogo-btn" onclick="switchTab('catalogo')"
+                    style="flex:1; padding:10px 4px; border:none; background:none; cursor:pointer; font-size:11px; font-weight:500; color:rgba(42,26,53,0.4); border-bottom:2px solid transparent; display:none;">
+                🗂 Catálogo
+            </button>
         </div>
 
         <!-- ORDERS TAB -->
@@ -464,6 +468,46 @@
                 <p style="font-size:11px; color:rgba(42,26,53,0.4); font-weight:500;">Activa o desactiva la disponibilidad de cada producto.</p>
             </div>
             <div id="admin-product-list" style="flex:1; overflow-y:auto; padding:0 20px 40px;"></div>
+        </div>
+
+        <!-- CATÁLOGO TAB -->
+        <div id="tab-catalogo" style="flex:1; overflow-y:auto; display:none; flex-direction:column;">
+            <div style="padding:12px 16px; display:flex; align-items:center; justify-content:space-between; flex-shrink:0; border-bottom:1px solid rgba(180,143,212,0.15);">
+                <p style="font-size:11px; color:rgba(42,26,53,0.4); font-weight:500;">Productos en el menú</p>
+                <button onclick="showNewProductForm()" style="font-size:11px; font-weight:600; color:white; background:#9B6DC5; border:none; border-radius:8px; padding:6px 14px; cursor:pointer;">+ Agregar</button>
+            </div>
+            <!-- Add new product form -->
+            <div id="new-product-form" style="display:none; padding:12px 16px; background:rgba(155,109,197,0.05); border-bottom:1px solid rgba(180,143,212,0.15);">
+                <p style="font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:#9B6DC5; margin-bottom:8px;">Nuevo producto</p>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <input id="new-p-name" type="text" placeholder="Nombre del producto"
+                           style="width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid rgba(180,143,212,0.35);font-size:13px;color:#2A1A35;background:white;font-family:Inter,sans-serif;box-sizing:border-box;">
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                        <input id="new-p-price" type="number" min="1" placeholder="Precio MXN"
+                               style="padding:8px 10px;border-radius:8px;border:1.5px solid rgba(180,143,212,0.35);font-size:13px;color:#2A1A35;background:white;font-family:Inter,sans-serif;box-sizing:border-box;">
+                        <select id="new-p-category"
+                                style="padding:8px 10px;border-radius:8px;border:1.5px solid rgba(180,143,212,0.35);font-size:13px;color:#2A1A35;background:white;font-family:Inter,sans-serif;">
+                            <option value="">Categoría...</option>
+                            <option>Pays dulces</option>
+                            <option>Pays salados</option>
+                            <option>Panqué</option>
+                            <option>Galletas</option>
+                            <option>Otras delicias</option>
+                            <option>Pasteles</option>
+                        </select>
+                    </div>
+                    <input id="new-p-id" type="text" placeholder="ID único (se genera si lo dejas vacío)"
+                           style="width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid rgba(180,143,212,0.35);font-size:13px;color:#2A1A35;background:white;font-family:Inter,sans-serif;box-sizing:border-box;">
+                    <div style="display:flex; gap:8px;">
+                        <button onclick="saveNewProduct()"
+                                style="flex:1;padding:9px;border-radius:8px;border:none;cursor:pointer;background:#2A1A35;color:white;font-size:12px;font-weight:600;">Guardar</button>
+                        <button onclick="showNewProductForm()"
+                                style="padding:9px 14px;border-radius:8px;border:1px solid rgba(180,143,212,0.3);cursor:pointer;background:white;color:rgba(42,26,53,0.5);font-size:12px;">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+            <!-- Product list -->
+            <div id="catalog-admin-list" style="padding:0 16px 40px;"></div>
         </div>
     </div>
 </div>
@@ -717,453 +761,7 @@
 
     <!-- helper macro: every card uses this exact structure -->
 
-    <!-- ══ PAYS DULCES ══ -->
-    <div style="margin-bottom:32px;">
-        <div class="section-heading">
-            <h3 class="font-serif" style="font-size:20px; font-weight:600; color:#9B6DC5; white-space:nowrap; letter-spacing:-0.01em;">Pays dulces</h3>
-        </div>
-        <p style="font-size:11px; color:rgba(42,26,53,0.4); margin-bottom:12px; margin-top:-8px;">5 variedades · Pieza entera</p>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-
-            <!-- TEST PRODUCT — remove after payment testing -->
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:2px dashed rgba(155,109,197,0.35);display:flex;align-items:center;gap:12px;"
-                 data-id="test-peso" data-name="🧪 Producto de prueba" data-price="1">
-                <div style="width:60px;height:60px;border-radius:10px;flex-shrink:0;background:rgba(155,109,197,0.08);display:flex;align-items:center;justify-content:center;font-size:24px;">🧪</div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#9B6DC5;">Producto de prueba</h4>
-                        <span class="price-tag" style="color:#9B6DC5;">MX$1</span>
-                    </div>
-                    <p style="font-size:10px;color:rgba(42,26,53,0.35);margin-top:2px;">Solo para pruebas · Eliminar después</p>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="pay-strudel-manzana" data-name="Strudel de manzana" data-price="130">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;overflow:hidden;text-overflow:ellipsis;padding-right:8px;">Strudel de manzana</h4>
-                        <span class="price-tag">MX$130</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="pay-queso" data-name="Pay de queso" data-price="130">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pay de queso</h4>
-                        <span class="price-tag">MX$130</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;position:relative;"
-                 data-id="pay-queso-fruta-choco" data-name="Pay de queso con fruta y/o chocolate" data-price="140">
-                <div style="position:absolute;top:-1px;right:10px;background:#9B6DC5;color:white;font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 8px;border-radius:0 0 6px 6px;text-transform:uppercase;">Más pedido</div>
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;overflow:hidden;text-overflow:ellipsis;padding-right:8px;">Pay de queso con fruta y/o chocolate</h4>
-                        <span class="price-tag">MX$140</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="pay-guayaba" data-name="Pay de guayaba" data-price="140">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pay de guayaba</h4>
-                        <span class="price-tag">MX$140</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="pay-pina" data-name="Pay de piña" data-price="140">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pay de piña</h4>
-                        <span class="price-tag">MX$140</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ══ PAYS SALADOS ══ -->
-    <div style="margin-bottom:32px;">
-        <div class="section-heading">
-            <h3 class="font-serif" style="font-size:20px; font-weight:600; color:#9B6DC5; white-space:nowrap; letter-spacing:-0.01em;">Pays salados</h3>
-        </div>
-        <p style="font-size:11px; color:rgba(42,26,53,0.4); margin-bottom:12px; margin-top:-8px;">4 variedades · Pieza entera</p>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="pay-jamon-queso" data-name="Pay de jamón con queso" data-price="130">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pay de jamón con queso</h4>
-                        <span class="price-tag">MX$130</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="pay-atun" data-name="Pay de atún" data-price="130">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pay de atún</h4>
-                        <span class="price-tag">MX$130</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="pay-espinacas-queso" data-name="Pay de espinacas con queso" data-price="130">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pay de espinacas con queso</h4>
-                        <span class="price-tag">MX$130</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="pay-champinones-queso" data-name="Pay de champiñones con queso" data-price="130">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pay de champiñones con queso</h4>
-                        <span class="price-tag">MX$130</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ══ PANQUÉ ══ -->
-    <div style="margin-bottom:32px;">
-        <div class="section-heading">
-            <h3 class="font-serif" style="font-size:20px; font-weight:600; color:#9B6DC5; white-space:nowrap; letter-spacing:-0.01em;">Panqué</h3>
-        </div>
-        <p style="font-size:11px; color:rgba(42,26,53,0.4); margin-bottom:12px; margin-top:-8px;">6 sabores · MX$160 c/u</p>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="panque-elote" data-name="Panqué de elote" data-price="160">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Panqué de elote</h4>
-                        <span class="price-tag">MX$160</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="panque-platano" data-name="Panqué de plátano" data-price="160">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Panqué de plátano</h4>
-                        <span class="price-tag">MX$160</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="panque-zanahoria" data-name="Panqué de zanahoria" data-price="160">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Panqué de zanahoria</h4>
-                        <span class="price-tag">MX$160</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="panque-naranja" data-name="Panqué de naranja" data-price="160">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Panqué de naranja</h4>
-                        <span class="price-tag">MX$160</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="panque-nuez" data-name="Panqué de nuez" data-price="160">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Panqué de nuez</h4>
-                        <span class="price-tag">MX$160</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="panque-marmoleado" data-name="Panqué marmoleado" data-price="160">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Panqué marmoleado</h4>
-                        <span class="price-tag">MX$160</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ══ GALLETAS ══ -->
-    <div style="margin-bottom:32px;">
-        <div class="section-heading">
-            <h3 class="font-serif" style="font-size:20px; font-weight:600; color:#9B6DC5; white-space:nowrap; letter-spacing:-0.01em;">Galletas</h3>
-        </div>
-        <p style="font-size:11px; color:rgba(42,26,53,0.4); margin-bottom:12px; margin-top:-8px;">4 variedades</p>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="galletas-mantequilla" data-name="Galletas de mantequilla" data-price="160">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Galletas de mantequilla</h4>
-                        <span class="price-tag">MX$160</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="galletas-encaneladas" data-name="Galletas encaneladas" data-price="160">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Galletas encaneladas</h4>
-                        <span class="price-tag">MX$160</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;position:relative;"
-                 data-id="besos-nuez" data-name="Besos de nuez" data-price="160">
-                <div style="position:absolute;top:-1px;right:10px;background:#9B6DC5;color:white;font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 8px;border-radius:0 0 6px 6px;text-transform:uppercase;">Favorita</div>
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Besos de nuez</h4>
-                        <span class="price-tag">MX$160</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="galletas-avena" data-name="Galletas de avena" data-price="130">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Galletas de avena</h4>
-                        <span class="price-tag">MX$130</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ══ OTRAS DELICIAS ══ -->
-    <div style="margin-bottom:32px;">
-        <div class="section-heading">
-            <h3 class="font-serif" style="font-size:20px; font-weight:600; color:#9B6DC5; white-space:nowrap; letter-spacing:-0.01em;">Otras delicias</h3>
-        </div>
-        <p style="font-size:11px; color:rgba(42,26,53,0.4); margin-bottom:12px; margin-top:-8px;">7 productos</p>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="brownies" data-name="Brownies" data-price="130">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Brownies</h4>
-                        <span class="price-tag">MX$130</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="roles-canela" data-name="Roles de canela" data-price="35">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Roles de canela</h4>
-                        <span class="price-tag">MX$35</span>
-                    </div>
-                    <p style="font-size:11px;color:rgba(42,26,53,0.45);margin-top:2px;">Por pieza</p>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="roles-canela-topping" data-name="Roles de canela con topping" data-price="40">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Roles de canela con topping</h4>
-                        <span class="price-tag">MX$40</span>
-                    </div>
-                    <p style="font-size:11px;color:rgba(42,26,53,0.45);margin-top:2px;">Por pieza</p>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="bunuelos-aire" data-name="Buñuelos de aire (20 piezas)" data-price="140">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Buñuelos de aire</h4>
-                        <span class="price-tag">MX$140</span>
-                    </div>
-                    <p style="font-size:11px;color:rgba(92,68,112,0.7);font-weight:500;margin-top:2px;">20 piezas</p>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="tartaleta-frutas-individual" data-name="Tartaleta con frutas (individual)" data-price="45">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Tartaleta con frutas</h4>
-                        <span class="price-tag">MX$45</span>
-                    </div>
-                    <p style="font-size:11px;color:rgba(42,26,53,0.45);margin-top:2px;">Individual</p>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="alfajores" data-name="Alfajores (6 piezas)" data-price="120">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Alfajores</h4>
-                        <span class="price-tag">MX$120</span>
-                    </div>
-                    <p style="font-size:11px;color:rgba(92,68,112,0.7);font-weight:500;margin-top:2px;">6 piezas</p>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- ══ PASTELES ══ -->
-    <div style="margin-bottom:32px;">
-        <div class="section-heading">
-            <h3 class="font-serif" style="font-size:20px; font-weight:600; color:#9B6DC5; white-space:nowrap; letter-spacing:-0.01em;">Pasteles</h3>
-        </div>
-        <p style="font-size:11px; color:rgba(42,26,53,0.4); margin-bottom:12px; margin-top:-8px;">5 creaciones · Bajo pedido</p>
-        <div style="display:flex; flex-direction:column; gap:10px;">
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;position:relative;"
-                 data-id="cheesecake-tortuga" data-name="Cheesecake tortuga" data-price="400">
-                <div style="position:absolute;top:-1px;right:10px;background:#9B6DC5;color:white;font-size:9px;font-weight:700;letter-spacing:0.06em;padding:3px 8px;border-radius:0 0 6px 6px;text-transform:uppercase;">Más pedido</div>
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Cheesecake tortuga</h4>
-                        <span class="price-tag">MX$400</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="tartaleta-frutas-entera" data-name="Tartaleta con frutas (entera)" data-price="350">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Tartaleta con frutas</h4>
-                        <span class="price-tag">MX$350</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="pastel-tres-leches" data-name="Pastel de tres leches" data-price="450">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pastel de tres leches</h4>
-                        <span class="price-tag">MX$450</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="pastel-red-velvet" data-name="Pastel de red velvet" data-price="400">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Pastel de red velvet</h4>
-                        <span class="price-tag">MX$400</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-            <div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
-                 data-id="imposible-elote" data-name="Imposible de elote" data-price="450">
-                <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;"></div>
-                <div style="flex:1;min-width:0;">
-                    <div style="display:flex;justify-content:space-between;align-items:baseline;">
-                        <h4 style="font-size:14px;font-weight:600;color:#2A1A35;">Imposible de elote</h4>
-                        <span class="price-tag">MX$450</span>
-                    </div>
-                    <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
-                </div>
-            </div>
-
-        </div>
-    </div>
+    <div id="menu-catalog"></div>
 
     <!-- ── INFO CARD ── -->
     <div style="background:#2A1A35; border-radius:18px; padding:20px; color:white;">
@@ -1554,40 +1152,8 @@
     //  STOCK SYSTEM
     // ════════════════════════════════
 
-    // All product IDs and names (must match data-id on cards)
-    const ALL_PRODUCTS = [
-        { id: 'test-peso',               name: '🧪 Producto de prueba' },
-        { id: 'pay-strudel-manzana',     name: 'Strudel de manzana' },
-        { id: 'pay-queso',               name: 'Pay de queso' },
-        { id: 'pay-queso-fruta-choco',   name: 'Pay de queso con fruta y/o chocolate' },
-        { id: 'pay-guayaba',             name: 'Pay de guayaba' },
-        { id: 'pay-pina',                name: 'Pay de piña' },
-        { id: 'pay-jamon-queso',         name: 'Pay de jamón con queso' },
-        { id: 'pay-atun',                name: 'Pay de atún' },
-        { id: 'pay-espinacas-queso',     name: 'Pay de espinacas con queso' },
-        { id: 'pay-champinones-queso',   name: 'Pay de champiñones con queso' },
-        { id: 'panque-elote',            name: 'Panqué de elote' },
-        { id: 'panque-platano',          name: 'Panqué de plátano' },
-        { id: 'panque-zanahoria',        name: 'Panqué de zanahoria' },
-        { id: 'panque-naranja',          name: 'Panqué de naranja' },
-        { id: 'panque-nuez',             name: 'Panqué de nuez' },
-        { id: 'panque-marmoleado',       name: 'Panqué marmoleado' },
-        { id: 'galletas-mantequilla',    name: 'Galletas de mantequilla' },
-        { id: 'galletas-encaneladas',    name: 'Galletas encaneladas' },
-        { id: 'besos-nuez',              name: 'Besos de nuez' },
-        { id: 'galletas-avena',          name: 'Galletas de avena' },
-        { id: 'brownies',                name: 'Brownies' },
-        { id: 'roles-canela',            name: 'Roles de canela' },
-        { id: 'roles-canela-topping',    name: 'Roles de canela con topping' },
-        { id: 'bunuelos-aire',           name: 'Buñuelos de aire' },
-        { id: 'tartaleta-frutas-individual', name: 'Tartaleta con frutas (individual)' },
-        { id: 'alfajores',               name: 'Alfajores' },
-        { id: 'cheesecake-tortuga',      name: 'Cheesecake tortuga' },
-        { id: 'tartaleta-frutas-entera', name: 'Tartaleta con frutas (entera)' },
-        { id: 'pastel-tres-leches',      name: 'Pastel de tres leches' },
-        { id: 'pastel-red-velvet',       name: 'Pastel de red velvet' },
-        { id: 'imposible-elote',         name: 'Imposible de elote' },
-    ];
+    // Populated dynamically from /api/products after loadCatalog()
+    let ALL_PRODUCTS = [];
 
     // Holds stock state: { productId: { current: N, limit: N } }
     // current = units available right now
@@ -1659,9 +1225,88 @@
         });
     }
 
+    // ════════════════════════════════
+    //  DYNAMIC CATALOG
+    // ════════════════════════════════
+
+    let catalogProducts = [];
+
+    const CATEGORY_META = [
+        { key: 'Pays dulces',    desc: 'Pieza entera' },
+        { key: 'Pays salados',   desc: 'Pieza entera' },
+        { key: 'Panqué',         desc: '' },
+        { key: 'Galletas',       desc: '' },
+        { key: 'Otras delicias', desc: '' },
+        { key: 'Pasteles',       desc: '' },
+    ];
+
+    async function loadCatalog() {
+        try {
+            const res  = await fetch('/api/products');
+            const data = await res.json();
+            if (!data.ok) return;
+            catalogProducts = data.products;
+            ALL_PRODUCTS = catalogProducts.map(p => ({ id: p.id, name: p.name }));
+            renderMenu();
+        } catch (e) {
+            console.warn('Could not load catalog');
+        }
+    }
+
+    function renderMenu() {
+        const container = document.getElementById('menu-catalog');
+        if (!container) return;
+        container.innerHTML = '';
+
+        const knownKeys = CATEGORY_META.map(m => m.key);
+        const extraCats = [...new Set(
+            catalogProducts
+                .filter(p => p.active !== false && !knownKeys.includes(p.category))
+                .map(p => p.category)
+        )];
+        const allMeta = [...CATEGORY_META, ...extraCats.map(k => ({ key: k, desc: '' }))];
+
+        allMeta.forEach(({ key, desc }) => {
+            const prods = catalogProducts.filter(p => p.category === key && p.active !== false);
+            if (!prods.length) return;
+
+            const count    = prods.length;
+            const subtitle = `${count} ${count === 1 ? 'variedad' : 'variedades'}${desc ? ' · ' + desc : ''}`;
+
+            const section = document.createElement('div');
+            section.style.cssText = 'margin-bottom:32px;';
+            section.innerHTML = `
+                <div class="section-heading">
+                    <h3 class="font-serif" style="font-size:20px;font-weight:600;color:#9B6DC5;white-space:nowrap;letter-spacing:-0.01em;">${key}</h3>
+                </div>
+                <p style="font-size:11px;color:rgba(42,26,53,0.4);margin-bottom:12px;margin-top:-8px;">${subtitle}</p>
+                <div style="display:flex;flex-direction:column;gap:10px;">
+                    ${prods.map(p => productCardHTML(p)).join('')}
+                </div>`;
+            container.appendChild(section);
+        });
+    }
+
+    function productCardHTML(p) {
+        const safeName = p.name.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        return `<div class="product-card" style="background:white;border-radius:14px;padding:12px;border:1px solid rgba(180,143,212,0.14);display:flex;align-items:center;gap:12px;"
+             data-id="${p.id}" data-name="${safeName}" data-price="${p.price}">
+            <div class="img-placeholder" style="width:60px;height:60px;border-radius:10px;flex-shrink:0;overflow:hidden;background:linear-gradient(135deg,#EEE4F8,#FAE8F0);"></div>
+            <div style="flex:1;min-width:0;">
+                <div style="display:flex;justify-content:space-between;align-items:baseline;">
+                    <h4 style="font-size:14px;font-weight:600;color:#2A1A35;overflow:hidden;text-overflow:ellipsis;padding-right:8px;">${p.name}</h4>
+                    <span class="price-tag">MX$${p.price}</span>
+                </div>
+                <button class="add-btn" onclick="addToCart(this)"><span class="btn-plus">+</span> Agregar</button>
+            </div>
+        </div>`;
+    }
+
     // ── Run on page load ──────────────────────────────────────────────────
-    loadStock();
-    loadImages();
+    loadCatalog().then(() => {
+        loadStock();
+        loadImages();
+    });
 
     // ── Load product images from KV ───────────────────────────────────────
     async function loadImages() {
@@ -1764,15 +1409,18 @@
     function applyRoleToTabs() {
         const analyticsBtn = document.getElementById('tab-analytics-btn');
         const stockBtn     = document.getElementById('tab-stock-btn');
+        const catalogoBtn  = document.getElementById('tab-catalogo-btn');
         const subtitle     = document.querySelector('.admin-subtitle');
 
         if (adminRole === 'employee') {
             if (analyticsBtn) analyticsBtn.style.display = 'none';
             if (stockBtn)     stockBtn.style.display     = 'none';
+            if (catalogoBtn)  catalogoBtn.style.display  = 'none';
             if (subtitle)     subtitle.textContent        = 'Sesión de empleada';
         } else {
             if (analyticsBtn) analyticsBtn.style.display = '';
             if (stockBtn)     stockBtn.style.display     = '';
+            if (catalogoBtn)  catalogoBtn.style.display  = '';
             if (subtitle)     subtitle.textContent        = 'Sesión de administradora';
         }
     }
@@ -1793,13 +1441,13 @@
         const grid = document.getElementById('venta-product-grid');
         if (!grid) return;
         grid.innerHTML = '';
-        const sellable = ALL_PRODUCTS.filter(p => p.id !== 'test-peso');
+        const sellable = catalogProducts.filter(p => p.active !== false);
         sellable.forEach(product => {
-            const card    = document.querySelector(`[data-id="${product.id}"]`);
-            const price   = card ? parseInt(card.dataset.price, 10) : 0;
+            const price   = product.price || 0;
             const current = stockData.current[product.id];
             const inStock = current === null || current === undefined || current > 0;
             const stockTxt= current !== null && current !== undefined ? `${current} disp.` : '∞';
+            const card    = document.querySelector(`[data-id="${product.id}"]`);
             const imgEl   = card?.querySelector('.img-placeholder img');
 
             const btn = document.createElement('button');
@@ -1909,10 +1557,11 @@
 
     // ── Tab switching ─────────────────────────────────────────────────────
     function switchTab(tab) {
-        const tabs = ['orders', 'venta', 'analytics', 'stock'];
+        const tabs = ['orders', 'venta', 'analytics', 'stock', 'catalogo'];
         tabs.forEach(t => {
             const panel = document.getElementById(`tab-${t}`);
             const btn   = document.getElementById(`tab-${t}-btn`);
+            if (!panel || !btn) return;
             const active = t === tab;
             panel.style.display    = active ? 'flex' : 'none';
             btn.style.color        = active ? '#9B6DC5' : 'rgba(42,26,53,0.4)';
@@ -1921,6 +1570,7 @@
         });
         if (tab === 'analytics') loadAnalytics();
         if (tab === 'venta')     loadVenta();
+        if (tab === 'catalogo')  renderCatalogAdmin();
     }
 
     // ── Load and render analytics ─────────────────────────────────────────
@@ -2128,24 +1778,21 @@
         const list = document.getElementById('admin-product-list');
         list.innerHTML = '';
 
-        const categories = [
-            { label: 'Pays dulces',    ids: ['pay-strudel-manzana','pay-queso','pay-queso-fruta-choco','pay-guayaba','pay-pina'] },
-            { label: 'Pays salados',   ids: ['pay-jamon-queso','pay-atun','pay-espinacas-queso','pay-champinones-queso'] },
-            { label: 'Panqué',         ids: ['panque-elote','panque-platano','panque-zanahoria','panque-naranja','panque-nuez','panque-marmoleado'] },
-            { label: 'Galletas',       ids: ['galletas-mantequilla','galletas-encaneladas','besos-nuez','galletas-avena'] },
-            { label: 'Otras delicias', ids: ['brownies','roles-canela','roles-canela-topping','bunuelos-aire','tartaleta-frutas-individual','alfajores'] },
-            { label: 'Pasteles',       ids: ['cheesecake-tortuga','tartaleta-frutas-entera','pastel-tres-leches','pastel-red-velvet','imposible-elote'] },
-        ];
+        const CAT_ORDER  = ['Pays dulces','Pays salados','Panqué','Galletas','Otras delicias','Pasteles'];
+        const extraCats  = [...new Set(catalogProducts.filter(p => !CAT_ORDER.includes(p.category)).map(p => p.category))];
+        const orderedCats = [...CAT_ORDER, ...extraCats];
 
-        categories.forEach(cat => {
-            const catLabel = document.createElement('p');
-            catLabel.style.cssText = 'font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(42,26,53,0.4);padding:16px 0 6px;';
-            catLabel.textContent = cat.label;
-            list.appendChild(catLabel);
+        orderedCats.forEach(catLabel => {
+            const catProds = catalogProducts.filter(p => p.category === catLabel);
+            if (!catProds.length) return;
 
-            cat.ids.forEach(id => {
-                const product = ALL_PRODUCTS.find(p => p.id === id);
-                if (!product) return;
+            const catEl = document.createElement('p');
+            catEl.style.cssText = 'font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(42,26,53,0.4);padding:16px 0 6px;';
+            catEl.textContent = catLabel;
+            list.appendChild(catEl);
+
+            catProds.forEach(product => {
+                const id = product.id;
 
                 const current = stockData.current[id];
                 const limit   = stockData.limits[id];
@@ -2215,6 +1862,196 @@
                 list.appendChild(row);
             });
         });
+    }
+
+    // ════════════════════════════════
+    //  CATÁLOGO ADMIN
+    // ════════════════════════════════
+
+    const CAT_OPTIONS  = ['Pays dulces','Pays salados','Panqué','Galletas','Otras delicias','Pasteles'];
+    const CAT_INPUT_ST = 'width:100%;padding:8px 10px;border-radius:8px;border:1.5px solid rgba(180,143,212,0.35);font-size:13px;color:#2A1A35;background:white;font-family:Inter,sans-serif;box-sizing:border-box;';
+
+    function renderCatalogAdmin() {
+        const list = document.getElementById('catalog-admin-list');
+        if (!list) return;
+        list.innerHTML = '';
+
+        const extraCats  = [...new Set(catalogProducts.filter(p => !CAT_OPTIONS.includes(p.category)).map(p => p.category))];
+        const orderedCats = [...CAT_OPTIONS, ...extraCats];
+
+        orderedCats.forEach(cat => {
+            const prods = catalogProducts.filter(p => p.category === cat);
+            if (!prods.length) return;
+
+            const catEl = document.createElement('p');
+            catEl.style.cssText = 'font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:rgba(42,26,53,0.4);padding:14px 0 6px;';
+            catEl.textContent = cat;
+            list.appendChild(catEl);
+
+            prods.forEach(p => {
+                const imgEl    = document.querySelector(`[data-id="${p.id}"] .img-placeholder img`);
+                const isActive = p.active !== false;
+                const thumbHTML = imgEl ? `<img src="${imgEl.src}" style="width:100%;height:100%;object-fit:cover;">` : '';
+
+                const row = document.createElement('div');
+                row.id = `cat-row-${p.id}`;
+                row.style.cssText = 'background:white;border-radius:12px;padding:10px 12px;margin-bottom:8px;border:1px solid rgba(180,143,212,0.14);';
+                row.innerHTML = `
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="width:36px;height:36px;border-radius:8px;overflow:hidden;flex-shrink:0;background:linear-gradient(135deg,#EEE4F8,#FAE8F0);display:flex;align-items:center;justify-content:center;">
+                            ${thumbHTML}
+                        </div>
+                        <div style="flex:1;min-width:0;">
+                            <p style="font-size:13px;font-weight:600;color:${isActive?'#2A1A35':'rgba(42,26,53,0.4)'};overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${p.name}</p>
+                            <p style="font-size:11px;color:#9B6DC5;font-family:'Cormorant Garamond',serif;">MX$${p.price}</p>
+                        </div>
+                        <div style="display:flex;align-items:center;gap:6px;flex-shrink:0;">
+                            <button onclick="toggleProduct('${p.id}')"
+                                    title="${isActive?'Activo · toca para desactivar':'Inactivo · toca para activar'}"
+                                    style="width:32px;height:18px;border-radius:9px;border:none;cursor:pointer;position:relative;background:${isActive?'#9B6DC5':'rgba(42,26,53,0.15)'};">
+                                <div style="position:absolute;top:2px;${isActive?'right:2px':'left:2px'};width:14px;height:14px;border-radius:50%;background:white;"></div>
+                            </button>
+                            <button onclick="toggleEditRow('${p.id}')"
+                                    style="width:28px;height:28px;border-radius:7px;border:1px solid rgba(155,109,197,0.3);cursor:pointer;background:rgba(155,109,197,0.06);font-size:13px;display:flex;align-items:center;justify-content:center;">✏️</button>
+                            <button onclick="deleteProduct('${p.id}')"
+                                    style="width:28px;height:28px;border-radius:7px;border:1px solid rgba(176,58,58,0.2);cursor:pointer;background:rgba(176,58,58,0.06);font-size:13px;display:flex;align-items:center;justify-content:center;">🗑</button>
+                        </div>
+                    </div>
+                    <div id="edit-form-${p.id}" style="display:none;margin-top:10px;padding-top:10px;border-top:1px solid rgba(180,143,212,0.15);">
+                        <div style="display:flex;flex-direction:column;gap:7px;">
+                            <input type="text" id="edit-name-${p.id}" value="${p.name.replace(/"/g,'&quot;')}" placeholder="Nombre" style="${CAT_INPUT_ST}">
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;">
+                                <input type="number" id="edit-price-${p.id}" value="${p.price}" min="1" placeholder="Precio" style="${CAT_INPUT_ST}">
+                                <select id="edit-cat-${p.id}" style="${CAT_INPUT_ST}">
+                                    ${CAT_OPTIONS.map(c=>`<option value="${c}"${c===p.category?' selected':''}>${c}</option>`).join('')}
+                                </select>
+                            </div>
+                            <button onclick="saveEditProduct('${p.id}')"
+                                    style="padding:8px;border-radius:8px;border:none;cursor:pointer;background:#9B6DC5;color:white;font-size:12px;font-weight:600;">Guardar cambios</button>
+                        </div>
+                    </div>`;
+                list.appendChild(row);
+            });
+        });
+    }
+
+    function toggleEditRow(id) {
+        const form = document.getElementById(`edit-form-${id}`);
+        if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    function showNewProductForm() {
+        const form = document.getElementById('new-product-form');
+        if (form) form.style.display = form.style.display === 'none' ? 'block' : 'none';
+    }
+
+    async function toggleProduct(id) {
+        try {
+            const res  = await fetch('/api/products', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                body: JSON.stringify({ action: 'toggle', id }),
+            });
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error);
+            catalogProducts = data.products;
+            ALL_PRODUCTS = catalogProducts.map(p => ({ id: p.id, name: p.name }));
+            renderMenu();
+            applyStockToMenu();
+            renderCatalogAdmin();
+        } catch (e) {
+            alert('Error al cambiar el estado del producto.');
+        }
+    }
+
+    async function saveEditProduct(id) {
+        const name     = document.getElementById(`edit-name-${id}`)?.value?.trim();
+        const price    = parseInt(document.getElementById(`edit-price-${id}`)?.value, 10);
+        const category = document.getElementById(`edit-cat-${id}`)?.value;
+
+        if (!name || isNaN(price) || price < 1 || !category) {
+            alert('Completa todos los campos correctamente.');
+            return;
+        }
+        try {
+            const res  = await fetch('/api/products', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                body: JSON.stringify({ action: 'upsert', product: { id, name, price, category } }),
+            });
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error);
+            catalogProducts = data.products;
+            ALL_PRODUCTS = catalogProducts.map(p => ({ id: p.id, name: p.name }));
+            renderMenu();
+            renderAdminList();
+            renderCatalogAdmin();
+        } catch (e) {
+            alert('Error al guardar el producto.');
+        }
+    }
+
+    async function deleteProduct(id) {
+        if (!confirm('¿Eliminar este producto del menú?')) return;
+        try {
+            const res  = await fetch('/api/products', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                body: JSON.stringify({ action: 'delete', id }),
+            });
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error);
+            catalogProducts = data.products;
+            ALL_PRODUCTS = catalogProducts.map(p => ({ id: p.id, name: p.name }));
+            renderMenu();
+            renderAdminList();
+            renderCatalogAdmin();
+        } catch (e) {
+            alert('Error al eliminar el producto.');
+        }
+    }
+
+    async function saveNewProduct() {
+        const name     = document.getElementById('new-p-name')?.value?.trim();
+        const price    = parseInt(document.getElementById('new-p-price')?.value, 10);
+        const category = document.getElementById('new-p-category')?.value;
+        let   id       = document.getElementById('new-p-id')?.value?.trim();
+
+        if (!name || isNaN(price) || price < 1 || !category) {
+            alert('Completa nombre, precio y categoría.');
+            return;
+        }
+        if (!id) {
+            id = name.toLowerCase()
+                .normalize('NFD').replace(/[̀-ͯ]/g, '')
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-+|-+$/g, '');
+        }
+        if (catalogProducts.find(p => p.id === id)) {
+            alert(`Ya existe un producto con ID "${id}". Cambia el ID.`);
+            return;
+        }
+        try {
+            const res  = await fetch('/api/products', {
+                method:  'POST',
+                headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${adminToken}` },
+                body: JSON.stringify({ action: 'upsert', product: { id, name, price, category, active: true } }),
+            });
+            const data = await res.json();
+            if (!data.ok) throw new Error(data.error);
+            catalogProducts = data.products;
+            ALL_PRODUCTS = catalogProducts.map(p => ({ id: p.id, name: p.name }));
+            renderMenu();
+            renderAdminList();
+            renderCatalogAdmin();
+            ['new-p-name','new-p-price','new-p-category','new-p-id'].forEach(fid => {
+                const el = document.getElementById(fid);
+                if (el) el.value = '';
+            });
+            document.getElementById('new-product-form').style.display = 'none';
+        } catch (e) {
+            alert('Error al agregar el producto.');
+        }
     }
 
     // ── Save daily limit ──────────────────────────────────────────────────
