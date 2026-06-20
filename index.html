@@ -290,6 +290,141 @@
             transition: opacity 0.15s, transform 0.1s;
         }
         .cart-trigger-btn:active { opacity: 0.88; transform: scale(0.99); }
+
+        /* ════════════════════════════════
+           DEVICE DETECTION & LAYOUT SWITCHING
+        ════════════════════════════════ */
+
+        /* Desktop layout: Transform existing components */
+        @media (min-width: 769px) {
+            /* Body layout: grid with sidebar */
+            body {
+                display: grid;
+                grid-template-columns: 320px 1fr;
+                gap: 0;
+                padding-bottom: 0;
+                height: 100vh;
+            }
+
+            /* Admin panel becomes left sidebar */
+            #admin-panel {
+                position: static;
+                width: 320px;
+                height: 100vh;
+                max-width: 320px;
+                z-index: 20;
+                border-radius: 0;
+                box-shadow: 1px 0 8px rgba(42,26,53,0.08);
+                border: none;
+            }
+
+            #admin-controls {
+                max-height: calc(100vh - 60px);
+                overflow-y: auto;
+            }
+
+            /* Main content area */
+            header {
+                position: static;
+                max-width: none;
+                margin: 0;
+                width: 100%;
+            }
+
+            main {
+                max-width: none;
+                margin: 0;
+                padding: 24px;
+                width: 100%;
+                overflow-y: auto;
+                height: calc(100vh - 80px);
+            }
+
+            footer {
+                position: static;
+                max-width: none;
+                width: 100%;
+                display: none; /* Hide sticky footer on desktop */
+            }
+
+            /* Lightbox and cart drawer still work as modals */
+            #lightbox,
+            #cart-drawer {
+                max-width: 90vw;
+            }
+
+            /* Product grid: multi-column on desktop */
+            #menu-catalog {
+                columns: auto;
+            }
+
+            #menu-catalog > div {
+                break-inside: avoid;
+                margin-bottom: 32px;
+            }
+
+            .product-card {
+                flex-direction: column;
+                align-items: flex-start;
+                padding: 16px;
+                width: 100%;
+            }
+
+            .product-card .img-placeholder {
+                width: 100%;
+                height: 180px;
+                margin-bottom: 12px;
+            }
+
+            /* Category sections as grid */
+            #menu-catalog > div > div:last-child {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+                gap: 12px;
+            }
+
+            /* Cart drawer: adapt to main content area */
+            #cart-drawer {
+                position: fixed;
+                bottom: auto;
+                right: 24px;
+                top: 80px;
+                width: 300px;
+                height: calc(100vh - 100px);
+                border-radius: 12px;
+                max-height: calc(100vh - 100px);
+                z-index: 50;
+            }
+
+            /* Tab buttons: horizontal layout in sidebar */
+            #admin-controls button[onclick^="switchTab"] {
+                width: 100%;
+                text-align: left;
+                padding: 12px 16px;
+                border-radius: 0;
+                border-bottom: 2px solid transparent;
+                border-left: 3px solid transparent;
+                color: rgba(42,26,53,0.4);
+                font-weight: 500;
+            }
+
+            #admin-controls button[onclick^="switchTab"][style*="color:#9B6DC5"] {
+                color: #9B6DC5;
+                border-left-color: #9B6DC5;
+                background: rgba(155,109,197,0.06);
+                font-weight: 600;
+            }
+
+            /* Admin tab panels: full height */
+            #tab-orders,
+            #tab-venta,
+            #tab-analytics,
+            #tab-stock,
+            #tab-catalogo {
+                height: calc(100vh - 320px);
+                overflow-y: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -2201,6 +2336,39 @@
     const spinStyle = document.createElement('style');
     spinStyle.textContent = '@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }';
     document.head.appendChild(spinStyle);
+
+    // ════════════════════════════════
+    //  DEVICE DETECTION & LAYOUT SWITCHING
+    // ════════════════════════════════
+
+    function detectAndApplyLayout() {
+        const isMobile = window.innerWidth <= 768;
+        const mobileLayout = document.getElementById('mobile-layout');
+        const desktopLayout = document.getElementById('desktop-layout');
+
+        if (mobileLayout) mobileLayout.classList.toggle('layout-mobile', isMobile);
+        if (mobileLayout) mobileLayout.classList.toggle('layout-desktop', !isMobile);
+
+        if (desktopLayout) desktopLayout.classList.toggle('layout-mobile', isMobile);
+        if (desktopLayout) desktopLayout.classList.toggle('layout-desktop', !isMobile);
+    }
+
+    // Apply layout on page load
+    detectAndApplyLayout();
+
+    // Re-apply on window resize
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            const newIsMobile = window.innerWidth <= 768;
+            const wasMobile = !document.getElementById('mobile-layout')?.classList.contains('layout-desktop');
+            if (newIsMobile !== wasMobile) {
+                location.reload(); // Reload to fully switch layouts
+            }
+        }, 300);
+    });
+
     function closeAdmin() {
         document.getElementById('admin-panel').classList.remove('active');
         // Reset login state so next open starts fresh
