@@ -124,6 +124,13 @@
             overflow: hidden;
         }
 
+        /* ── Product list (mobile: single column, desktop: overridden to grid) ── */
+        .products-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
         /* ── Section heading ── */
         .section-heading {
             display: flex;
@@ -383,8 +390,8 @@
                 margin-bottom: 16px;
             }
 
-            /* Desktop product cards: vertical layout with larger images */
-            #menu-catalog > div > div:last-child {
+            /* Desktop product cards: multi-column grid */
+            .products-grid {
                 display: grid;
                 grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
                 gap: 20px;
@@ -1489,7 +1496,7 @@
                     <h3 class="font-serif" style="font-size:20px;font-weight:600;color:#9B6DC5;white-space:nowrap;letter-spacing:-0.01em;">${key}</h3>
                 </div>
                 <p style="font-size:11px;color:rgba(42,26,53,0.4);margin-bottom:12px;margin-top:-8px;">${subtitle}</p>
-                <div style="display:flex;flex-direction:column;gap:10px;">
+                <div class="products-grid">
                     ${prods.map(p => productCardHTML(p)).join('')}
                 </div>`;
             container.appendChild(section);
