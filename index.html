@@ -846,6 +846,14 @@
         </div>
     </div>
 
+    <!-- Admin access -->
+    <div style="padding:20px 0 100px; text-align:center;">
+        <button onclick="openAdmin()"
+                style="background:none; border:none; cursor:pointer; font-size:11px; color:rgba(42,26,53,0.25); font-weight:500; letter-spacing:0.03em; padding:8px 16px;">
+            Acceso administración
+        </button>
+    </div>
+
 </main>
 
 
@@ -2277,6 +2285,10 @@
             const newOrders = (data.orders || []).filter(o => !knownOrderIds.has(o.paymentId));
             if (newOrders.length > 0) showOrdersBadge(newOrders.length);
         } catch(e) {}
+    }
+
+    function openAdmin() {
+        document.getElementById('admin-panel').classList.add('active');
     }
 
     function closeAdmin() {
