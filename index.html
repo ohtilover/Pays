@@ -259,6 +259,27 @@
             flex-direction: column;
         }
         #admin-panel.active { display: flex; }
+        @keyframes badge-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50%       { transform: scale(1.3); opacity: 0.8; }
+        }
+        .orders-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 16px;
+            height: 16px;
+            padding: 0 4px;
+            border-radius: 8px;
+            background: #E9A0B8;
+            color: #2A1A35;
+            font-size: 10px;
+            font-weight: 700;
+            margin-left: 4px;
+            animation: badge-pulse 1.5s ease-in-out infinite;
+            vertical-align: middle;
+            line-height: 16px;
+        }
         .admin-toggle {
             display: flex;
             align-items: center;
@@ -362,7 +383,7 @@
         <div style="display:flex; border-bottom:1px solid rgba(180,143,212,0.2); flex-shrink:0; background:white;">
             <button id="tab-orders-btn" onclick="switchTab('orders')"
                     style="flex:1; padding:10px 4px; border:none; background:none; cursor:pointer; font-size:11px; font-weight:600; color:#9B6DC5; border-bottom:2px solid #9B6DC5;">
-                📋 Pedidos
+                📋 Pedidos<span id="orders-badge" class="orders-badge" style="display:none;"></span>
             </button>
             <button id="tab-venta-btn" onclick="switchTab('venta')"
                     style="flex:1; padding:10px 4px; border:none; background:none; cursor:pointer; font-size:11px; font-weight:500; color:rgba(42,26,53,0.4); border-bottom:2px solid transparent;">
@@ -823,6 +844,14 @@
                 <span style="color:rgba(255,255,255,0.3);">Cerrado</span>
             </div>
         </div>
+    </div>
+
+    <!-- Admin access -->
+    <div style="padding:20px 0 100px; text-align:center;">
+        <button onclick="openAdmin()"
+                style="background:none; border:none; cursor:pointer; font-size:11px; color:rgba(42,26,53,0.25); font-weight:500; letter-spacing:0.03em; padding:8px 16px;">
+            Acceso administración
+        </button>
     </div>
 
 </main>
@@ -1381,6 +1410,9 @@
     // adminRole   = 'admin' or 'employee' — controls which tabs are visible
     let adminToken = null;
     let adminRole  = null;
+    let knownOrderIds    = null; // Set of paymentIds seen on last orders load
+    let currentTab       = 'orders';
+    let orderPollInterval = null;
 
     async function verifyAdmin() {
         const input = document.getElementById('admin-password-input');
@@ -1418,6 +1450,10 @@
                 renderAdminList();
                 loadAnalytics();
             }
+
+            // Start silent background poll for new orders
+            if (orderPollInterval) clearInterval(orderPollInterval);
+            orderPollInterval = setInterval(pollOrdersBg, 30000);
 
         } catch (e) {
             err.textContent = 'Error de conexión';
@@ -1579,6 +1615,7 @@
 
     // ── Tab switching ─────────────────────────────────────────────────────
     function switchTab(tab) {
+        currentTab = tab;
         const tabs = ['orders', 'venta', 'analytics', 'stock', 'catalogo'];
         tabs.forEach(t => {
             const panel = document.getElementById(`tab-${t}`);
@@ -1590,6 +1627,7 @@
             btn.style.fontWeight   = active ? '600' : '500';
             btn.style.borderBottom = active ? '2px solid #9B6DC5' : '2px solid transparent';
         });
+        if (tab === 'orders')    { clearOrdersBadge(); loadOrders(); }
         if (tab === 'analytics') loadAnalytics();
         if (tab === 'venta')     loadVenta();
         if (tab === 'catalogo')  renderCatalogAdmin();
@@ -1714,6 +1752,7 @@
             const data = await res.json();
 
             if (!data.ok || !data.orders.length) {
+                knownOrderIds = new Set();
                 list.innerHTML = `
                     <div style="text-align:center;padding:48px 24px;color:rgba(42,26,53,0.35);">
                         <div style="font-size:32px;margin-bottom:8px;">🧺</div>
@@ -1725,6 +1764,8 @@
 
             list.innerHTML = '';
             data.orders.forEach(order => renderOrderCard(order, list));
+            knownOrderIds = new Set(data.orders.map(o => o.paymentId));
+            clearOrdersBadge();
 
         } catch (e) {
             list.innerHTML = `<div style="text-align:center;padding:32px;color:#b03a3a;font-size:12px;">Error al cargar pedidos</div>`;
@@ -2225,7 +2266,35 @@
     document.head.appendChild(spinStyle);
 
 
+    function showOrdersBadge(count) {
+        const badge = document.getElementById('orders-badge');
+        if (!badge) return;
+        badge.textContent = count > 9 ? '9+' : String(count);
+        badge.style.display = 'inline-flex';
+    }
+    function clearOrdersBadge() {
+        const badge = document.getElementById('orders-badge');
+        if (badge) badge.style.display = 'none';
+    }
+    async function pollOrdersBg() {
+        if (!adminToken || currentTab === 'orders' || knownOrderIds === null) return;
+        try {
+            const res  = await fetch('/api/orders', { headers: { 'Authorization': `Bearer ${adminToken}` } });
+            const data = await res.json();
+            if (!data.ok) return;
+            const newOrders = (data.orders || []).filter(o => !knownOrderIds.has(o.paymentId));
+            if (newOrders.length > 0) showOrdersBadge(newOrders.length);
+        } catch(e) {}
+    }
+
+    function openAdmin() {
+        document.getElementById('admin-panel').classList.add('active');
+    }
+
     function closeAdmin() {
+        if (orderPollInterval) { clearInterval(orderPollInterval); orderPollInterval = null; }
+        knownOrderIds = null;
+        currentTab    = 'orders';
         document.getElementById('admin-panel').classList.remove('active');
         // Reset login state so next open starts fresh
         adminToken = null;
